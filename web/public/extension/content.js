@@ -135,8 +135,8 @@
                         await clearUserAuth();
                         return '登录已过期，请重新登录';
                     } else if (response.status === 429) {
-                        const planName = data.limits ? .plan === 'free' ? '免费用户' :
-                            data.limits ? .plan === 'premium' ? 'Premium会员' : '年费会员';
+                        const planName = data.limits ?.plan === 'free' ? '免费用户' :
+                            data.limits ?.plan === 'premium' ? 'Premium会员' : '年费会员';
                         return `使用次数已达上限！当前计划：${planName}，请升级会员或等待重置`;
                     } else {
                         return `错误：${data.error || '未知错误'}`;
@@ -565,8 +565,8 @@
                                     currentChoices: (content.choices || []).map(choice => choice.answer),
                                     imageUrl: content.image || '',
                                     imageMetadata: content.imageMetadata || {},
-                                    videoUrl: content.video ? .fullUrl || '',
-                                    videoService: content.video ? .service || '',
+                                    videoUrl: content.video ?.fullUrl || '',
+                                    videoService: content.video ?.service || '',
                                     layout: content.layout || 'Unknown',
                                     questionIndex: content.questionIndex || 0,
                                     totalQuestions: content.totalGameBlockCount || 0,
@@ -657,3 +657,5 @@
     });
 
 })();
+
+
