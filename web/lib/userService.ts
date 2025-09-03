@@ -56,7 +56,7 @@ export class UserService {
     });
 
     // 返回用户信息（不包含密码）
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _password, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
@@ -84,7 +84,7 @@ export class UserService {
     }
 
     // 返回用户信息（不包含密码）
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _password2, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
@@ -103,7 +103,7 @@ export class UserService {
     }
 
     // 返回用户信息（不包含密码）
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _password3, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 
@@ -118,7 +118,7 @@ export class UserService {
       }
     });
 
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _password4, ...userWithoutPassword } = user;
     return userWithoutPassword;
   }
 

@@ -5,7 +5,11 @@ import Link from 'next/link';
 import { CheckCircle, Zap, Shield, Clock, Star, ArrowRight } from 'lucide-react';
 
 export default function Home() {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<{
+    id: string;
+    name: string;
+    email: string;
+  } | null>(null);
 
   useEffect(() => {
     // 检查用户登录状态

@@ -2,8 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 
 // TODO: 替换为实际的数据库操作
-let users: any[] = [];
+const users: unknown[] = [];
 const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret-key-change-in-production';
+
+interface Order {
+  id: string;
+  userId: string;
+  plan: string;
+  amount: number;
+  currency: string;
+  status: string;
+  createdAt: string;
+  paymentUrl: string;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,7 +32,8 @@ export async function POST(request: NextRequest) {
 
     try {
       decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
-    } catch (jwtError) {
+    } catch (error) {
+      console.warn('JWT verification failed:', error);
       return NextResponse.json(
         { error: '无效的授权令牌' },
         { status: 401 }
@@ -38,25 +50,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 查找用户
-    const user = users.find(u => u.id === decoded.userId);
-    if (!user) {
-      return NextResponse.json(
-        { error: '用户不存在' },
-        { status: 404 }
-      );
-    }
+    // TODO: 实际项目中应该从数据库查找用户
+    // const user = await getUserById(decoded.userId);
+    // if (!user) {
+    //   return NextResponse.json({ error: '用户不存在' }, { status: 404 });
+    // }
 
     // 创建订单
-    const order = {
+    const order: Order = {
       id: `order_${Date.now()}`,
-      userId: user.id,
+      userId: decoded.userId,
       plan: plan,
       amount: plan === 'monthly' ? 10 : 30,
       currency: 'CNY',
       status: 'pending',
       createdAt: new Date().toISOString(),
-      // TODO: 集成支付服务提供商
       paymentUrl: '' // 初始化为空字符串
     };
 
@@ -82,7 +90,7 @@ export async function POST(request: NextRequest) {
 }
 
 // TODO: 实现实际的支付集成
-async function createPaymentSession(order: any): Promise<string> {
+async function createPaymentSession(order: Order): Promise<string> {
   // 这里应该集成实际的支付服务提供商
   // 例如：
   
@@ -154,7 +162,8 @@ export async function GET(request: NextRequest) {
 
     try {
       decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
-    } catch (jwtError) {
+    } catch (error) {
+      console.warn('JWT verification failed:', error);
       return NextResponse.json(
         { error: '无效的授权令牌' },
         { status: 401 }
@@ -162,7 +171,7 @@ export async function GET(request: NextRequest) {
     }
 
     // TODO: 从数据库获取用户订单历史
-    const orders: any[] = []; // 这里应该查询数据库
+    const orders: unknown[] = []; // 这里应该查询数据库
 
     return NextResponse.json({
       orders: orders

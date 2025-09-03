@@ -123,7 +123,7 @@ function generateToken(payload) {
 function verifyToken(token) {
     try {
         return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$jsonwebtoken$2f$index$2e$js__$5b$app$2d$route$5d$__$28$ecmascript$29$__["default"].verify(token, JWT_SECRET);
-    } catch (error) {
+    } catch  {
         return null;
     }
 }
@@ -207,7 +207,7 @@ class UserService {
             }
         });
         // 返回用户信息（不包含密码）
-        const { password: _, ...userWithoutPassword } = user;
+        const { password: _password, ...userWithoutPassword } = user;
         return userWithoutPassword;
     }
     // 用户登录
@@ -232,7 +232,7 @@ class UserService {
             throw new Error('邮箱或密码错误');
         }
         // 返回用户信息（不包含密码）
-        const { password: _, ...userWithoutPassword } = user;
+        const { password: _password2, ...userWithoutPassword } = user;
         return userWithoutPassword;
     }
     // 根据ID获取用户信息
@@ -250,7 +250,7 @@ class UserService {
             throw new Error('用户不存在');
         }
         // 返回用户信息（不包含密码）
-        const { password: _, ...userWithoutPassword } = user;
+        const { password: _password3, ...userWithoutPassword } = user;
         return userWithoutPassword;
     }
     // 更新用户信息
@@ -265,7 +265,7 @@ class UserService {
                 usageRecords: true
             }
         });
-        const { password: _, ...userWithoutPassword } = user;
+        const { password: _password4, ...userWithoutPassword } = user;
         return userWithoutPassword;
     }
     // 记录AI请求使用情况

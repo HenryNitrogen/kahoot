@@ -47,6 +47,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 }
 
 
+// Validate ../../app/admin/page.tsx
+{
+  const handler = {} as typeof import("../../app/admin/page.js")
+  handler satisfies AppPageConfig<"/admin">
+}
+
 // Validate ../../app/dashboard/page.tsx
 {
   const handler = {} as typeof import("../../app/dashboard/page.js")
@@ -57,6 +63,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/download/page.js")
   handler satisfies AppPageConfig<"/download">
+}
+
+// Validate ../../app/extension/page.tsx
+{
+  const handler = {} as typeof import("../../app/extension/page.js")
+  handler satisfies AppPageConfig<"/extension">
 }
 
 // Validate ../../app/login/page.tsx
@@ -71,6 +83,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/">
 }
 
+// Validate ../../app/redeem/page.tsx
+{
+  const handler = {} as typeof import("../../app/redeem/page.js")
+  handler satisfies AppPageConfig<"/redeem">
+}
+
 // Validate ../../app/register/page.tsx
 {
   const handler = {} as typeof import("../../app/register/page.js")
@@ -81,6 +99,18 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/test/page.js")
   handler satisfies AppPageConfig<"/test">
+}
+
+// Validate ../../app/api/admin/codes/route.ts
+{
+  const handler = {} as typeof import("../../app/api/admin/codes/route.js")
+  handler satisfies RouteHandlerConfig<"/api/admin/codes">
+}
+
+// Validate ../../app/api/admin/dashboard/route.ts
+{
+  const handler = {} as typeof import("../../app/api/admin/dashboard/route.js")
+  handler satisfies RouteHandlerConfig<"/api/admin/dashboard">
 }
 
 // Validate ../../app/api/auth/login/route.ts
@@ -111,6 +141,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/api/payment/webhook/route.js")
   handler satisfies RouteHandlerConfig<"/api/payment/webhook">
+}
+
+// Validate ../../app/api/redeem/route.ts
+{
+  const handler = {} as typeof import("../../app/api/redeem/route.js")
+  handler satisfies RouteHandlerConfig<"/api/redeem">
 }
 
 

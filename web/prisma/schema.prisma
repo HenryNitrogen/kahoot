@@ -17,12 +17,16 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  isAdmin   Boolean  @default(false) // 管理员标识
 
   // 订阅信息
   subscription Subscription?
   
   // 使用记录
   usageRecords UsageRecord[]
+  
+  // 兑换记录
+  redemptions Redemption[]
 
   @@map("users")
 }
@@ -67,4 +71,35 @@ model AIRequest {
   createdAt   DateTime @default(now())
 
   @@map("ai_requests")
+}
+
+model RedeemCode {
+  id          String   @id @default(cuid())
+  code        String   @unique // 兑换码
+  planType    String   // premium, pro
+  duration    Int      // 持续时间（天）
+  isUsed      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime? // 兑换码过期时间（可选）
+  
+  // 使用信息
+  redemption  Redemption?
+  
+  @@map("redeem_codes")
+}
+
+model Redemption {
+  id          String   @id @default(cuid())
+  userId      String
+  codeId      String   @unique
+  planType    String   // premium, pro
+  startDate   DateTime @default(now()) // 开始时间
+  endDate     DateTime // 结束时间
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  redeemCode  RedeemCode @relation(fields: [codeId], references: [id], onDelete: Cascade)
+  
+  @@map("redemptions")
 }

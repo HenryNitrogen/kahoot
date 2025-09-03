@@ -97,7 +97,7 @@ function Register() {
             } else {
                 setError(data.error || '注册失败');
             }
-        } catch (error) {
+        } catch (err) {
             setError('网络错误，请重试');
         } finally{
             setLoading(false);
