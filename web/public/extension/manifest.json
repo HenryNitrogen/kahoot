@@ -2,23 +2,28 @@
     "manifest_version": 3,
     "name": "Kahoot智能助手",
     "version": "1.0.0",
-    "description": "AI驱动的Kahoot答题助手，提供智能答案推荐",
-    "permissions": ["activeTab", "storage"],
+    "description": "智能驱动的Kahoot答题助手，提供智能答案推荐",
+    "permissions": ["activeTab", "storage", "alarms"],
     "host_permissions": [
         "https://kahoot.it/*",
         "http://localhost:3001/*",
         "https://api.henryni.cn/*"
     ],
-    "content_scripts": [{
-        "matches": ["https://kahoot.it/*"],
-        "js": ["content.js"],
-        "world": "MAIN"
-    }],
-    "icons": {
-        "16": "icon16.png",
-        "48": "icon48.png",
-        "128": "icon128.png"
+    "background": {
+        "service_worker": "background.js"
     },
+    "content_scripts": [{
+            "matches": ["https://kahoot.it/*"],
+            "js": ["content-bridge.js"],
+            "world": "ISOLATED"
+        },
+        {
+            "matches": ["https://kahoot.it/*"],
+            "js": ["content.js"],
+            "world": "MAIN"
+        }
+    ],
+
     "action": {
         "default_popup": "popup.html",
         "default_title": "Kahoot智能助手"
