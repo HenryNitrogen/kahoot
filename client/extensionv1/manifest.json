@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "Kahoot Quiz Info Display with AI Integration",
+    "version": "0.9",
+    "description": "Display detailed Kahoot quiz information with user-customizable, movable, and minimizable display options and AI answers",
+    "permissions": [
+        "storage",
+        "activeTab"
+    ],
+    "host_permissions": [
+        "https://kahoot.it/*",
+        "https://api.henryni.cn/*",
+        "http://localhost:932/*"
+    ],
+    "content_scripts": [{
+        "matches": ["https://kahoot.it/*", "file://*/test-page.html"],
+        "js": ["content.js"],
+        "run_at": "document_start",
+        "world": "MAIN"
+    }],
+    "web_accessible_resources": [{
+        "resources": ["*"],
+        "matches": ["https://kahoot.it/*"]
+    }]
+}
