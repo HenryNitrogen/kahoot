@@ -4,7 +4,7 @@
 
         // 配置信息
         const config = {
-            apiUrl: 'http://kahoot.henryni.cn/api', // 开发环境，生产环境需要修改
+            apiUrl: 'https://kahoot.henryni.cn/api', // 开发环境，生产环境需要修改
 
             version: '1.0.0'
         };
@@ -746,3 +746,4 @@
     });
 
 })();
+

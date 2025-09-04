@@ -16,7 +16,7 @@ chrome.runtime.onInstalled.addListener((details) => {
         });
 
 
-        chrome.tabs.create({ url: 'http://localhost:3001/welcome' });
+        chrome.tabs.create({ url: 'https://kahoot.henryni.cn' });
     }
 });
 
@@ -27,8 +27,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'getApiUrl') {
         // 返回API URL配置
         sendResponse({
-            apiUrl: 'http://localhost:3001/api',
-            webUrl: 'http://localhost:3001'
+            apiUrl: 'https://kahoot.henryni.cn/api',
+            webUrl: 'https://kahoot.henryni.cn'
         });
     }
 

@@ -4,8 +4,8 @@
 
     // 配置信息
     const config = {
-        apiUrl: 'http://localhost:3001/api', // 开发环境
-        webUrl: 'http://localhost:3001', // Web页面URL
+        apiUrl: 'https://kahoot.henryni.cn/api', // 开发环境
+        webUrl: 'https://kahoot.henryni.cn', // Web页面URL
         // 生产环境配置：
         // apiUrl: 'https://your-domain.com/api',
         // webUrl: 'https://your-domain.com',
