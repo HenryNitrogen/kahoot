@@ -4,8 +4,8 @@
 
         // 配置信息
         const config = {
-            apiUrl: 'http://localhost:3001/api', // 开发环境，生产环境需要修改
-            // apiUrl: 'https://your-domain.com/api', // 生产环境
+            apiUrl: 'http://kahoot.henryni.cn/api', // 开发环境，生产环境需要修改
+
             version: '1.0.0'
         };
 
@@ -135,8 +135,8 @@
                         await clearUserAuth();
                         return '登录已过期，请重新登录';
                     } else if (response.status === 429) {
-                        const planName = data.limits ?.plan === 'free' ? '免费用户' :
-                            data.limits ?.plan === 'premium' ? 'Premium会员' : '年费会员';
+                        const planName = data.limits ? .plan === 'free' ? '免费用户' :
+                            data.limits ? .plan === 'premium' ? 'Premium会员' : '年费会员';
                         return `使用次数已达上限！当前计划：${planName}，请升级会员或等待重置`;
                     } else {
                         return `错误：${data.error || '未知错误'}`;
@@ -157,6 +157,10 @@
 
         // 创建可拖拽的UI元素
         function createDraggableElement(id, initialTop, initialLeft, isMenu = false) {
+            // 获取保存的缩放比例
+            const savedScale = localStorage.getItem(`kahoot_smart_${id}_scale`) || '1';
+            const scale = parseFloat(savedScale);
+
             let div = document.createElement('div');
             div.id = id;
             div.style.position = 'fixed';
@@ -178,6 +182,8 @@
             div.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
             div.style.border = '1px solid rgba(255, 255, 255, 0.2)';
             div.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+            div.style.transform = `scale(${scale})`;
+            div.style.transformOrigin = 'top left';
 
             let header = document.createElement('div');
             header.style.cursor = 'move';
@@ -192,20 +198,72 @@
             const title = isMenu ? '⚙️ 智能助手设置' : '🤖 Kahoot智能助手';
             header.innerHTML = `<strong style="font-size: 16px; background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${title}</strong>`;
 
+            // 创建控制按钮容器
+            let controlsContainer = document.createElement('div');
+            controlsContainer.style.float = 'right';
+            controlsContainer.style.display = 'flex';
+            controlsContainer.style.gap = '4px';
+
+            // 缩放减小按钮
+            let scaleDownBtn = document.createElement('button');
+            scaleDownBtn.innerText = '−';
+            scaleDownBtn.title = '缩小';
+            scaleDownBtn.style.background = 'rgba(255, 255, 255, 0.15)';
+            scaleDownBtn.style.backdropFilter = 'blur(10px)';
+            scaleDownBtn.style.webkitBackdropFilter = 'blur(10px)';
+            scaleDownBtn.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+            scaleDownBtn.style.color = 'white';
+            scaleDownBtn.style.cursor = 'pointer';
+            scaleDownBtn.style.borderRadius = '6px';
+            scaleDownBtn.style.padding = '2px 6px';
+            scaleDownBtn.style.fontSize = '12px';
+            scaleDownBtn.style.transition = 'all 0.3s ease';
+
+            // 缩放显示
+            let scaleDisplay = document.createElement('span');
+            scaleDisplay.style.background = 'rgba(255, 255, 255, 0.1)';
+            scaleDisplay.style.padding = '2px 6px';
+            scaleDisplay.style.borderRadius = '6px';
+            scaleDisplay.style.fontSize = '10px';
+            scaleDisplay.style.opacity = '0.8';
+            scaleDisplay.textContent = Math.round(scale * 100) + '%';
+
+            // 缩放增大按钮
+            let scaleUpBtn = document.createElement('button');
+            scaleUpBtn.innerText = '+';
+            scaleUpBtn.title = '放大';
+            scaleUpBtn.style.background = 'rgba(255, 255, 255, 0.15)';
+            scaleUpBtn.style.backdropFilter = 'blur(10px)';
+            scaleUpBtn.style.webkitBackdropFilter = 'blur(10px)';
+            scaleUpBtn.style.border = '1px solid rgba(255, 255, 255, 0.3)';
+            scaleUpBtn.style.color = 'white';
+            scaleUpBtn.style.cursor = 'pointer';
+            scaleUpBtn.style.borderRadius = '6px';
+            scaleUpBtn.style.padding = '2px 6px';
+            scaleUpBtn.style.fontSize = '12px';
+            scaleUpBtn.style.transition = 'all 0.3s ease';
+
+            // 最小化按钮
             let minimizeBtn = document.createElement('button');
             minimizeBtn.innerText = '−';
-            minimizeBtn.style.float = 'right';
+            minimizeBtn.title = '最小化';
             minimizeBtn.style.background = 'rgba(255, 255, 255, 0.15)';
             minimizeBtn.style.backdropFilter = 'blur(10px)';
             minimizeBtn.style.webkitBackdropFilter = 'blur(10px)';
             minimizeBtn.style.border = '1px solid rgba(255, 255, 255, 0.3)';
             minimizeBtn.style.color = 'white';
             minimizeBtn.style.cursor = 'pointer';
-            minimizeBtn.style.borderRadius = '8px';
-            minimizeBtn.style.padding = '4px 10px';
+            minimizeBtn.style.borderRadius = '6px';
+            minimizeBtn.style.padding = '2px 8px';
             minimizeBtn.style.fontSize = '14px';
             minimizeBtn.style.transition = 'all 0.3s ease';
-            header.appendChild(minimizeBtn);
+            minimizeBtn.style.marginLeft = '4px';
+
+            controlsContainer.appendChild(scaleDownBtn);
+            controlsContainer.appendChild(scaleDisplay);
+            controlsContainer.appendChild(scaleUpBtn);
+            controlsContainer.appendChild(minimizeBtn);
+            header.appendChild(controlsContainer);
 
             div.appendChild(header);
             let content = document.createElement('div');
@@ -223,24 +281,55 @@
             // 悬停效果
             div.addEventListener('mouseenter', () => {
                 div.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%)';
-                div.style.transform = 'translateY(-2px)';
                 div.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)';
             });
 
             div.addEventListener('mouseleave', () => {
                 div.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)';
-                div.style.transform = 'translateY(0)';
                 div.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
             });
 
-            minimizeBtn.addEventListener('mouseenter', () => {
-                minimizeBtn.style.background = 'rgba(255, 255, 255, 0.25)';
-                minimizeBtn.style.transform = 'scale(1.05)';
+            // 按钮悬停效果
+            [scaleDownBtn, scaleUpBtn, minimizeBtn].forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    btn.style.background = 'rgba(255, 255, 255, 0.25)';
+                    btn.style.transform = 'scale(1.05)';
+                });
+
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.background = 'rgba(255, 255, 255, 0.15)';
+                    btn.style.transform = 'scale(1)';
+                });
             });
 
-            minimizeBtn.addEventListener('mouseleave', () => {
-                minimizeBtn.style.background = 'rgba(255, 255, 255, 0.15)';
-                minimizeBtn.style.transform = 'scale(1)';
+            // 缩放功能
+            let currentScale = scale;
+
+            const updateScale = (newScale) => {
+                newScale = Math.max(0.5, Math.min(2, newScale)); // 限制缩放范围在0.5x到2x之间
+                currentScale = newScale;
+                div.style.transform = `scale(${currentScale})`;
+                scaleDisplay.textContent = Math.round(currentScale * 100) + '%';
+                localStorage.setItem(`kahoot_smart_${id}_scale`, currentScale.toString());
+            };
+
+            scaleDownBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                updateScale(currentScale - 0.1);
+            });
+
+            scaleUpBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                updateScale(currentScale + 0.1);
+            });
+
+            // 鼠标滚轮缩放（按住Ctrl键时）
+            div.addEventListener('wheel', (e) => {
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    const delta = e.deltaY > 0 ? -0.05 : 0.05;
+                    updateScale(currentScale + delta);
+                }
             });
 
             // 拖拽功能
@@ -565,8 +654,8 @@
                                     currentChoices: (content.choices || []).map(choice => choice.answer),
                                     imageUrl: content.image || '',
                                     imageMetadata: content.imageMetadata || {},
-                                    videoUrl: content.video ?.fullUrl || '',
-                                    videoService: content.video ?.service || '',
+                                    videoUrl: content.video ? .fullUrl || '',
+                                    videoService: content.video ? .service || '',
                                     layout: content.layout || 'Unknown',
                                     questionIndex: content.questionIndex || 0,
                                     totalQuestions: content.totalGameBlockCount || 0,
@@ -657,5 +746,3 @@
     });
 
 })();
-
-

@@ -110,7 +110,7 @@ export default function TestExtension() {
   useEffect(() => {
     // 检查扩展状态
     if (typeof window !== 'undefined') {
-      if ((window as any).chrome && (window as any).chrome.runtime) {
+      if ((window as Window & {chrome?: {runtime?: unknown}}).chrome?.runtime) {
         setExtensionStatus('success');
       } else {
         setExtensionStatus('error');
@@ -141,8 +141,8 @@ export default function TestExtension() {
           <ol className="list-decimal list-inside space-y-2 text-gray-300">
             <li>打开Chrome浏览器</li>
             <li>在地址栏输入: <code className="bg-gray-700 px-2 py-1 rounded">chrome://extensions/</code></li>
-            <li>开启"开发者模式"</li>
-            <li>点击"加载已解压的扩展程序"</li>
+            <li>开启&ldquo;开发者模式&rdquo;</li>
+            <li>点击&ldquo;加载已解压的扩展程序&rdquo;</li>
             <li>选择路径: <code className="bg-gray-700 px-2 py-1 rounded text-sm">/Users/henrynitrogen/hi/projects/kahoot/web/public/extension</code></li>
           </ol>
         </div>

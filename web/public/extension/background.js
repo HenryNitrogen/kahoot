@@ -15,8 +15,8 @@ chrome.runtime.onInstalled.addListener((details) => {
             installDate: new Date().toISOString()
         });
 
-        // 可选：打开欢迎页面
-        // chrome.tabs.create({ url: 'http://localhost:3001/welcome' });
+
+        chrome.tabs.create({ url: 'http://localhost:3001/welcome' });
     }
 });
 

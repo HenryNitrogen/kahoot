@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { RefreshCw, Database, Server, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
@@ -8,7 +8,7 @@ interface TestResult {
   name: string;
   status: 'success' | 'error' | 'warning' | 'loading';
   message: string;
-  details?: any;
+  details?: Record<string, unknown>;
   timestamp?: string;
 }
 
@@ -382,7 +382,7 @@ export default function TestPage() {
           {testResults.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Server className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p>点击"开始测试"来检查系统状态</p>
+              <p>点击&ldquo;开始测试&rdquo;来检查系统状态</p>
             </div>
           ) : (
             <div className="space-y-3">

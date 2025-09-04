@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Download, Chrome, Shield, Zap, Users, Star, ArrowRight, ExternalLink } from 'lucide-react';
 
 export default function ExtensionPage() {
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalUsers: 1247,
     totalQuestions: 15683,
     accuracy: 94.2
@@ -191,7 +191,7 @@ export default function ExtensionPage() {
               <div className="flex items-start gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
                 <div>
-                  <p><strong className="text-white">下载扩展：</strong>点击上方的"下载Chrome扩展"按钮，保存zip文件到电脑</p>
+                  <p><strong className="text-white">下载扩展：</strong>点击上方的&ldquo;下载Chrome扩展&rdquo;按钮，保存zip文件到电脑</p>
                 </div>
               </div>
               
@@ -212,14 +212,14 @@ export default function ExtensionPage() {
               <div className="flex items-start gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
                 <div>
-                  <p><strong className="text-white">开启开发者模式：</strong>在页面右上角打开"开发者模式"开关</p>
+                  <p><strong className="text-white">开启开发者模式：</strong>在页面右上角打开&ldquo;开发者模式&rdquo;开关</p>
                 </div>
               </div>
               
               <div className="flex items-start gap-3">
                 <span className="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-bold">5</span>
                 <div>
-                  <p><strong className="text-white">加载扩展：</strong>点击"加载已解压的扩展程序"，选择解压后的文件夹</p>
+                  <p><strong className="text-white">加载扩展：</strong>点击&ldquo;加载已解压的扩展程序&rdquo;，选择解压后的文件夹</p>
                 </div>
               </div>
               

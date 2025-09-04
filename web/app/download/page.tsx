@@ -166,7 +166,7 @@ console.log('Kahoot Quiz Helper loaded!');
               </div>
               <div>
                 <h4 className="font-medium text-gray-900 mb-1">启用开发者模式</h4>
-                <p className="text-gray-600 text-sm">在右上角开启"开发者模式"开关</p>
+                <p className="text-gray-600 text-sm">在右上角开启&ldquo;开发者模式&rdquo;开关</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
@@ -175,7 +175,7 @@ console.log('Kahoot Quiz Helper loaded!');
               </div>
               <div>
                 <h4 className="font-medium text-gray-900 mb-1">加载扩展</h4>
-                <p className="text-gray-600 text-sm">点击"加载已解压的扩展程序"，选择解压后的文件夹</p>
+                <p className="text-gray-600 text-sm">点击&ldquo;加载已解压的扩展程序&rdquo;，选择解压后的文件夹</p>
               </div>
             </div>
             <div className="flex items-start space-x-4">
