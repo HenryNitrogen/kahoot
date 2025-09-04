@@ -435,7 +435,7 @@ function DownloadStepContent() {
           </div>
           <div>
             <p className="font-medium text-gray-900">加载扩展</p>
-            <p className="text-sm text-gray-600">拖拽CRX文件到页面，或使用&ldquo;加载已解压的扩展程序&rdquo;</p>
+            <p className="text-sm text-gray-600">使用&ldquo;加载已解压的扩展程序&rdquo;</p>
           </div>
         </div>
       </div>
