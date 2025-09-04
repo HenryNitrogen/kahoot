@@ -110,6 +110,12 @@
       "regex": "^/test\\-extension(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/test\\-extension(?:/)?$"
+    },
+    {
+      "page": "/tutorial",
+      "regex": "^/tutorial(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/tutorial(?:/)?$"
     }
   ],
   "dataRoutes": [],

@@ -107,6 +107,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/test">
 }
 
+// Validate ../../app/tutorial/page.tsx
+{
+  const handler = {} as typeof import("../../app/tutorial/page.js")
+  handler satisfies AppPageConfig<"/tutorial">
+}
+
 // Validate ../../app/api/admin/codes/route.ts
 {
   const handler = {} as typeof import("../../app/api/admin/codes/route.js")
@@ -141,6 +147,18 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/api/auth/register/route.js")
   handler satisfies RouteHandlerConfig<"/api/auth/register">
+}
+
+// Validate ../../app/api/download/extension/route.ts
+{
+  const handler = {} as typeof import("../../app/api/download/extension/route.js")
+  handler satisfies RouteHandlerConfig<"/api/download/extension">
+}
+
+// Validate ../../app/api/download/stats/route.ts
+{
+  const handler = {} as typeof import("../../app/api/download/stats/route.js")
+  handler satisfies RouteHandlerConfig<"/api/download/stats">
 }
 
 // Validate ../../app/api/payment/create-order/route.ts

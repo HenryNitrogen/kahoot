@@ -78,6 +78,12 @@ export default function Home() {
               </div>
             </div>
             <nav className="flex items-center space-x-4">
+              <Link href="/tutorial" className="text-gray-700 hover:text-indigo-600 transition-colors">
+                使用教程
+              </Link>
+              <Link href="/download" className="text-gray-700 hover:text-indigo-600 transition-colors">
+                下载扩展
+              </Link>
               {user ? (
                 <div className="flex items-center space-x-4">
                   <span className="text-gray-700">欢迎, {user.email}</span>
@@ -96,12 +102,6 @@ export default function Home() {
                 </div>
               ) : (
                 <div className="flex items-center space-x-4">
-                  <Link
-                    href="/test"
-                    className="text-gray-700 hover:text-indigo-600 transition-colors"
-                  >
-                    系统测试
-                  </Link>
                   <Link
                     href="/login"
                     className="text-gray-700 hover:text-indigo-600 transition-colors"
@@ -144,6 +144,12 @@ export default function Home() {
               className="border-2 border-indigo-600 text-indigo-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-indigo-50 transition-colors"
             >
               下载扩展
+            </Link>
+            <Link
+              href="/tutorial"
+              className="bg-green-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-green-700 transition-colors flex items-center"
+            >
+              查看教程 <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </div>
         </div>
@@ -256,16 +262,16 @@ export default function Home() {
               <h4 className="font-semibold mb-4">产品</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/download" className="hover:text-white transition-colors">下载扩展</Link></li>
-                <li><Link href="/pricing" className="hover:text-white transition-colors">价格</Link></li>
-                <li><Link href="/features" className="hover:text-white transition-colors">功能</Link></li>
+                <li><Link href="/tutorial" className="hover:text-white transition-colors">使用教程</Link></li>
+                <li><Link href="/dashboard" className="hover:text-white transition-colors">控制面板</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4">支持</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><Link href="/help" className="hover:text-white transition-colors">帮助中心</Link></li>
-                <li><Link href="/contact" className="hover:text-white transition-colors">联系我们</Link></li>
-                <li><Link href="/faq" className="hover:text-white transition-colors">常见问题</Link></li>
+                <li><Link href="/test-extension" className="hover:text-white transition-colors">测试扩展</Link></li>
+                <li><a href="mailto:support@henryni.cn" className="hover:text-white transition-colors">联系我们</a></li>
+                <li><Link href="/redeem" className="hover:text-white transition-colors">兑换码</Link></li>
               </ul>
             </div>
             <div>
