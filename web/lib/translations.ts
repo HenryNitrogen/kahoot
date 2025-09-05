@@ -203,13 +203,15 @@ export const translations = {
 
 export function getTranslation(lang: Language, key: string): string {
   const keys = key.split('.');
-  let value: any = translations[lang];
+  let value: Record<string, unknown> | string = translations[lang];
   
   for (const k of keys) {
-    value = value?.[k];
+    if (typeof value === 'object' && value !== null) {
+      value = (value as Record<string, unknown>)[k] as Record<string, unknown> | string;
+    }
   }
   
-  return value || key;
+  return typeof value === 'string' ? value : key;
 }
 
 export async function detectLanguageByIP(): Promise<Language> {

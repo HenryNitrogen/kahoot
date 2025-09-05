@@ -7,18 +7,14 @@ import {
   Plus, 
   Copy, 
   RefreshCw, 
-  Calendar,
   Users,
   Gift,
   TrendingUp,
-  AlertCircle,
   CheckCircle,
-  Clock,
   Search,
   Edit,
   Trash2,
-  UserCheck,
-  UserX
+  UserCheck
 } from 'lucide-react';
 
 interface AdminStats {
@@ -229,7 +225,7 @@ export default function AdminPanel() {
         <div className="text-center bg-white rounded-2xl p-12 shadow-2xl">
           <Shield className="h-16 w-16 text-red-600 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Unauthorized</h1>
-          <p className="text-gray-600 mb-4">You don't have permission to access the admin panel</p>
+          <p className="text-gray-600 mb-4">You don&apos;t have permission to access the admin panel</p>
           <button
             onClick={() => router.push('/dashboard')}
             className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-6 py-3 rounded-full hover:shadow-lg transition-all duration-300"
@@ -277,7 +273,7 @@ export default function AdminPanel() {
               ].map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
+                  onClick={() => setActiveTab(tab.id as 'overview' | 'users' | 'codes')}
                   className={`flex items-center space-x-2 py-2 px-4 border-b-2 font-medium text-sm transition-all duration-300 ${
                     activeTab === tab.id
                       ? 'border-purple-500 text-purple-600 bg-purple-50 rounded-t-lg'

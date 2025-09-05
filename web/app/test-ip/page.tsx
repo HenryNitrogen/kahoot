@@ -4,7 +4,13 @@ import { useState, useEffect } from 'react';
 import { detectUserLocation, getLanguageByCountry } from '@/lib/i18n';
 
 export default function TestIP() {
-  const [ipInfo, setIpInfo] = useState<any>(null);
+  const [ipInfo, setIpInfo] = useState<{
+    ip?: string;
+    country_code?: string;
+    country_name?: string;
+    region?: string;
+    city?: string;
+  } | null>(null);
   const [countryCode, setCountryCode] = useState<string>('');
   const [detectedLanguage, setDetectedLanguage] = useState<string>('');
   const [loading, setLoading] = useState(true);

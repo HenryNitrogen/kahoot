@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Gift, CheckCircle, Clock, Star } from 'lucide-react';
+import { Gift, CheckCircle, Clock } from 'lucide-react';
 import { useTranslations } from '@/lib/i18n';
 
 interface Redemption {
