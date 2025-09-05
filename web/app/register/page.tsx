@@ -19,7 +19,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-  const { translations, language, setLanguage, loading: i18nLoading } = useTranslations();
+  const { translations } = useTranslations();
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

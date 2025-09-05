@@ -14,7 +14,7 @@ declare global {
     grecaptcha: {
       enterprise: {
         ready: (callback: () => void) => void;
-        render: (container: string | Element, parameters: any) => number;
+        render: (container: string | Element, parameters: Record<string, unknown>) => number;
         execute: (widgetId?: number) => void;
         reset: (widgetId?: number) => void;
         getResponse: (widgetId?: number) => string;
@@ -87,7 +87,7 @@ export default function ReCaptchaEnterprise({
                     onExpired();
                   }
                 },
-                'error-callback': (error: any) => {
+                'error-callback': (error: Error | string) => {
                   console.error('reCAPTCHA Enterprise error:', error);
                   setHasError(true);
                   onVerify(null);

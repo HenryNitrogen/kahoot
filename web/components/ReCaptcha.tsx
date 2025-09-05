@@ -51,10 +51,10 @@ export default function ReCaptcha({
     }
   };
 
-  const handleError = (error?: any) => {
+  const handleError = () => {
     setHasError(true);
     onVerify(null);
-    console.error('reCAPTCHA error occurred:', error);
+    console.error('reCAPTCHA error occurred');
     console.error('Site key being used:', siteKey);
     console.error('Make sure the site key is for reCAPTCHA v2 (not v3) and the domain is correctly configured');
   };

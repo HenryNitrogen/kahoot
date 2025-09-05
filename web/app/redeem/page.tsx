@@ -24,7 +24,7 @@ export default function RedeemPage() {
   const [messageType, setMessageType] = useState<'success' | 'error' | ''>('');
   const [redemptions, setRedemptions] = useState<Redemption[]>([]);
   const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-  const { translations, loading: i18nLoading } = useTranslations();
+    const { translations } = useTranslations();
 
   const router = useRouter();
 
