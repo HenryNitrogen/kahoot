@@ -82,7 +82,7 @@ export default function RedeemPage() {
     e.preventDefault();
     
     if (!redeemCode.trim()) {
-      setMessage('请输入兑换码');
+      setMessage(translations.enterRedeemCode);
       setMessageType('error');
       return;
     }
@@ -105,7 +105,7 @@ export default function RedeemPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(`兑换成功！已获得${data.redemption.planType === 'pro' ? '专业版' : '高级版'}权限`);
+        setMessage(`${translations.redeemSuccess}！已获得${data.redemption.planType === 'pro' ? translations.proVersion : translations.premiumVersion}权限`);
         setMessageType('success');
         setRedeemCode('');
         loadRedemptions();
@@ -115,11 +115,11 @@ export default function RedeemPage() {
           router.push('/dashboard');
         }, 3000);
       } else {
-        setMessage(data.error || '兑换失败，请重试');
+        setMessage(data.error || translations.registrationFailed);
         setMessageType('error');
       }
     } catch (error) {
-      setMessage('兑换失败，请检查网络连接');
+      setMessage(translations.networkError);
       setMessageType('error');
       console.error('Redeem error:', error);
     } finally {
@@ -140,7 +140,7 @@ export default function RedeemPage() {
   };
 
   const getPlanDisplayName = (planType: string) => {
-    return planType === 'pro' ? '专业版' : '高级版';
+    return planType === 'pro' ? translations.proVersion : translations.premiumVersion;
   };
 
   const getPlanColor = (planType: string) => {
@@ -165,15 +165,15 @@ export default function RedeemPage() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
               <Gift className="h-8 w-8 text-indigo-600" />
-              <span className="text-2xl font-bold text-gray-900">兑换中心</span>
+              <span className="text-2xl font-bold text-gray-900">{translations.redeemCenter}</span>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700">欢迎, {user.name}</span>
+              <span className="text-gray-700">{translations.welcome}, {user.name}</span>
               <button
                 onClick={() => router.push('/dashboard')}
                 className="text-indigo-600 hover:text-indigo-700 transition-colors"
               >
-                返回控制台
+                {translations.back}
               </button>
             </div>
           </div>
@@ -183,12 +183,12 @@ export default function RedeemPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 兑换表单 */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">兑换兑换码</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{translations.redeemCode}</h2>
           
           <form onSubmit={handleRedeem} className="space-y-4">
             <div>
               <label htmlFor="redeemCode" className="block text-sm font-medium text-gray-700 mb-2">
-                兑换码
+                {translations.redeemCode}
               </label>
               <div className="flex space-x-4">
                 <input
@@ -196,7 +196,7 @@ export default function RedeemPage() {
                   type="text"
                   value={redeemCode}
                   onChange={(e) => setRedeemCode(e.target.value)}
-                  placeholder="请输入兑换码，例如：ABCD-1234-EFGH"
+                  placeholder={translations.enterRedeemCode}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono"
                 />
                 <button
@@ -204,7 +204,7 @@ export default function RedeemPage() {
                   disabled={isRedeeming}
                   className="px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 transition-colors"
                 >
-                  {isRedeeming ? '兑换中...' : '兑换'}
+                  {isRedeeming ? translations.redeeming : translations.redeem}
                 </button>
               </div>
             </div>
@@ -228,24 +228,24 @@ export default function RedeemPage() {
           </form>
 
           <div className="mt-6 p-4 bg-gray-50 rounded-md">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">兑换说明：</h3>
+            <h3 className="text-sm font-medium text-gray-700 mb-2">{translations.redeemInstructionsTitle}</h3>
             <ul className="text-sm text-gray-600 space-y-1">
-              <li>• 兑换码不区分大小写，支持带或不带连字符</li>
-              <li>• 兑换成功后将立即激活对应套餐权限</li>
-              <li>• 每个兑换码只能使用一次</li>
-              <li>• 兑换后的权限时间从兑换时刻开始计算</li>
+              <li>• {translations.redeemInstruction1}</li>
+              <li>• {translations.redeemInstruction2}</li>
+              <li>• {translations.redeemInstruction3}</li>
+              <li>• {translations.redeemInstruction4}</li>
             </ul>
           </div>
         </div>
 
         {/* 兑换记录 */}
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">我的兑换记录</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">{translations.redeemHistory}</h2>
           
           {redemptions.length === 0 ? (
             <div className="text-center py-8">
               <Gift className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">还没有兑换记录</p>
+              <p className="text-gray-500">{translations.noRedeemHistory}</p>
             </div>
           ) : (
             <div className="space-y-4">
@@ -261,22 +261,22 @@ export default function RedeemPage() {
                           {getPlanDisplayName(redemption.planType)}
                         </span>
                         <span className="text-sm text-gray-500">
-                          兑换码: {redemption.redeemCode.code}
+                          {translations.redeemCode}: {redemption.redeemCode.code}
                         </span>
                       </div>
                       
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         <div>
-                          <span className="text-gray-500">开始时间:</span>
+                          <span className="text-gray-500">{translations.startTime}:</span>
                           <p className="font-medium">{formatDate(redemption.startDate)}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500">结束时间:</span>
+                          <span className="text-gray-500">{translations.endTime}:</span>
                           <p className="font-medium">{formatDate(redemption.endDate)}</p>
                         </div>
                         <div>
-                          <span className="text-gray-500">剩余天数:</span>
-                          <p className="font-medium">{getDaysRemaining(redemption.endDate)} 天</p>
+                          <span className="text-gray-500">{translations.remainingDays}:</span>
+                          <p className="font-medium">{getDaysRemaining(redemption.endDate)} {translations.days}</p>
                         </div>
                       </div>
                     </div>
@@ -285,12 +285,12 @@ export default function RedeemPage() {
                       {redemption.isActive && getDaysRemaining(redemption.endDate) > 0 ? (
                         <div className="flex items-center text-green-600">
                           <CheckCircle className="h-5 w-5 mr-1" />
-                          <span className="text-sm font-medium">活跃中</span>
+                          <span className="text-sm font-medium">{translations.active}</span>
                         </div>
                       ) : (
                         <div className="flex items-center text-gray-500">
                           <Clock className="h-5 w-5 mr-1" />
-                          <span className="text-sm font-medium">已过期</span>
+                          <span className="text-sm font-medium">{translations.expired}</span>
                         </div>
                       )}
                     </div>

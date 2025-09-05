@@ -11,9 +11,9 @@ const AI_CONFIG = {
 
 // 用量限制配置
 const USAGE_LIMITS = {
-  free: { total: 7 }, // 免费用户累计7个问题
-  premium: { monthly: 300 }, // premium会员每月300个问题
-  pro: { monthly: 2000 } // 年会员每月2000个问题
+  free: { daily: 4 }, // 免费用户每天4次
+  premium: { monthly: 200 }, // Premium会员每月200次（10元/月）
+  pro: { yearly: 2000 } // Pro会员每年2000次（50元/年）
 };
 
 async function callAI(question: string, choices: string[], answersAllowed: number) {
@@ -61,9 +61,16 @@ async function callAI(question: string, choices: string[], answersAllowed: numbe
 }
 
 async function checkUsageLimit(userId: string, plan: string): Promise<boolean> {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const thisMonth = new Date();
   thisMonth.setDate(1);
   thisMonth.setHours(0, 0, 0, 0);
+
+  const thisYear = new Date();
+  thisYear.setMonth(0, 1);
+  thisYear.setHours(0, 0, 0, 0);
 
   // 获取或创建使用记录
   let usageRecord = await prisma.usageRecord.findFirst({
@@ -81,8 +88,19 @@ async function checkUsageLimit(userId: string, plan: string): Promise<boolean> {
     });
   }
 
-  // 检查是否需要重置当月计数
+  // 检查是否需要重置计数
   const lastRequestDate = new Date(usageRecord.lastRequestDate);
+  
+  // 重置今日计数
+  if (lastRequestDate < today) {
+    await prisma.usageRecord.update({
+      where: { id: usageRecord.id },
+      data: { requestsToday: 0 }
+    });
+    usageRecord.requestsToday = 0;
+  }
+
+  // 重置当月计数
   if (lastRequestDate < thisMonth) {
     await prisma.usageRecord.update({
       where: { id: usageRecord.id },
@@ -91,15 +109,17 @@ async function checkUsageLimit(userId: string, plan: string): Promise<boolean> {
     usageRecord.requestsThisMonth = 0;
   }
 
-  const limits = USAGE_LIMITS[plan as keyof typeof USAGE_LIMITS] || USAGE_LIMITS.free;
-  
+  // 检查限制
   if (plan === 'free') {
-    const limits = USAGE_LIMITS.free;
-    return usageRecord.totalRequests < limits.total;
-  } else {
-    const limits = USAGE_LIMITS[plan as 'premium' | 'pro'] || USAGE_LIMITS.premium;
-    return usageRecord.requestsThisMonth < limits.monthly;
+    return usageRecord.requestsToday < USAGE_LIMITS.free.daily;
+  } else if (plan === 'premium') {
+    return usageRecord.requestsThisMonth < USAGE_LIMITS.premium.monthly;
+  } else if (plan === 'pro') {
+    // Pro是年度计划，但我们用月度来计算，每月最多166次(2000/12)
+    return usageRecord.requestsThisMonth < Math.floor(USAGE_LIMITS.pro.yearly / 12);
   }
+  
+  return false;
 }
 
 async function updateUsage(userId: string) {
@@ -181,8 +201,10 @@ export async function POST(request: NextRequest) {
           limits: {
             plan: userPlan,
             ...(userPlan === 'free' ? 
-              { total: USAGE_LIMITS.free.total } : 
-              { monthly: USAGE_LIMITS[userPlan as 'premium' | 'pro'].monthly }
+              { daily: USAGE_LIMITS.free.daily } : 
+              userPlan === 'premium' ?
+                { monthly: USAGE_LIMITS.premium.monthly } :
+                { yearly: USAGE_LIMITS.pro.yearly }
             )
           }
         },
@@ -293,8 +315,10 @@ export async function GET(request: NextRequest) {
         total: usageRecord.totalRequests
       },
       limits: userPlan === 'free' ? 
-        { total: USAGE_LIMITS.free.total } : 
-        { monthly: USAGE_LIMITS[userPlan as 'premium' | 'pro'].monthly }
+        { daily: USAGE_LIMITS.free.daily } : 
+        userPlan === 'premium' ?
+          { monthly: USAGE_LIMITS.premium.monthly } :
+          { yearly: USAGE_LIMITS.pro.yearly }
     });
 
   } catch (error) {

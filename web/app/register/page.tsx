@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Zap, Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
+import { useTranslations } from '@/lib/i18n';
+import ReCaptcha from '@/components/ReCaptcha';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -16,6 +18,8 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const { translations, language, setLanguage, loading: i18nLoading } = useTranslations();
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,14 +34,20 @@ export default function Register() {
     setLoading(true);
     setError('');
 
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA verification');
+      setLoading(false);
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
-      setError('密码确认不匹配');
+      setError(translations.passwordMismatch);
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('密码长度不能少于6位');
+      setError(translations.passwordTooShort);
       setLoading(false);
       return;
     }
@@ -51,7 +61,8 @@ export default function Register() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          recaptchaToken
         }),
       });
 
@@ -61,13 +72,19 @@ export default function Register() {
         localStorage.setItem('authToken', data.token);
         router.push('/dashboard');
       } else {
-        setError(data.error || '注册失败');
+        setError(data.error || translations.registrationFailed);
+        setRecaptchaToken(null); // Reset reCAPTCHA on error
       }
     } catch (err) {
-      setError('网络错误，请重试');
+      setError(translations.networkError);
+      setRecaptchaToken(null); // Reset reCAPTCHA on error
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRecaptchaChange = (token: string | null) => {
+    setRecaptchaToken(token);
   };
 
   return (
@@ -78,10 +95,10 @@ export default function Register() {
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center space-x-2 mb-6">
               <Zap className="h-8 w-8 text-indigo-600" />
-              <span className="text-2xl font-bold text-gray-900">Kahoot助手</span>
+              <span className="text-2xl font-bold text-gray-900">KQH</span>
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">创建账户</h1>
-            <p className="text-gray-600">开始使用智能Kahoot助手</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{translations.createNewAccount}</h1>
+            <p className="text-gray-600">{translations.getStarted}</p>
           </div>
 
           {/* Error Message */}
@@ -95,7 +112,7 @@ export default function Register() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                用户名
+                {translations.fullName}
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -107,14 +124,14 @@ export default function Register() {
                   onChange={handleChange}
                   required
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                  placeholder="请输入您的用户名"
+                  placeholder={translations.enterFullName}
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                邮箱地址
+                {translations.emailAddress}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -126,14 +143,14 @@ export default function Register() {
                   onChange={handleChange}
                   required
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                  placeholder="请输入您的邮箱"
+                  placeholder={translations.enterEmail}
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                密码
+                {translations.password}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -146,7 +163,7 @@ export default function Register() {
                   required
                   minLength={6}
                   className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                  placeholder="请输入密码（至少6位）"
+                  placeholder={translations.enterPassword}
                 />
                 <button
                   type="button"
@@ -160,7 +177,7 @@ export default function Register() {
 
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-                确认密码
+                {translations.confirmPassword}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -172,7 +189,7 @@ export default function Register() {
                   onChange={handleChange}
                   required
                   className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                  placeholder="请再次输入密码"
+                  placeholder={translations.enterConfirmPassword}
                 />
                 <button
                   type="button"
@@ -185,30 +202,38 @@ export default function Register() {
             </div>
 
             <div className="text-xs text-gray-500">
-              注册即表示您同意我们的
-              <Link href="/terms" className="text-indigo-600 hover:text-indigo-700">使用条款</Link>
-              和
-              <Link href="/privacy" className="text-indigo-600 hover:text-indigo-700">隐私政策</Link>
+              {translations.agreeToTerms}
+              <Link href="/terms" className="text-indigo-600 hover:text-indigo-700">{translations.termsAndConditions}</Link>
+              {translations.and}
+              <Link href="/privacy" className="text-indigo-600 hover:text-indigo-700">{translations.privacyPolicy}</Link>
+            </div>
+
+            {/* reCAPTCHA */}
+            <div className="flex justify-center">
+              <ReCaptcha 
+                onVerify={handleRecaptchaChange}
+                onExpired={() => setRecaptchaToken(null)}
+              />
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !recaptchaToken}
               className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? '注册中...' : '创建账户'}
+              {loading ? translations.registering : translations.signUp}
             </button>
           </form>
 
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-gray-600">
-              已有账户？
+              {translations.alreadyHaveAccount}
               <Link
                 href="/login"
                 className="text-indigo-600 hover:text-indigo-700 font-medium ml-1"
               >
-                立即登录
+                {translations.signInInstead}
               </Link>
             </p>
           </div>

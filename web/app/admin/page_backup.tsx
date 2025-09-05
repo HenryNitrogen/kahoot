@@ -143,16 +143,12 @@ export default function AdminPanel() {
 
       if (response.ok) {
         const data = await response.json();
-        setCodes(data.codes || []);
-        setCurrentPage(data.page || 1);
-        setTotalPages(data.totalPages || 1);
-      } else {
-        console.error('Failed to load codes:', response.status);
-        setCodes([]);
+        setCodes(data.codes);
+        setCurrentPage(data.page);
+        setTotalPages(data.totalPages);
       }
     } catch (error) {
       console.error('Load codes error:', error);
-      setCodes([]);
     }
   };
 
@@ -167,14 +163,10 @@ export default function AdminPanel() {
 
       if (response.ok) {
         const data = await response.json();
-        setUsers(data.users || []);
-      } else {
-        console.error('Failed to load users:', response.status);
-        setUsers([]);
+        setUsers(data.users);
       }
     } catch (error) {
       console.error('Load users error:', error);
-      setUsers([]);
     }
   };
 
@@ -362,7 +354,7 @@ export default function AdminPanel() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {(users || []).filter(user => 
+                  {users.filter(user => 
                     user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     user.email.toLowerCase().includes(searchTerm.toLowerCase())
                   ).map((user) => (
@@ -515,7 +507,7 @@ export default function AdminPanel() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {(codes || []).map((code) => (
+                  {codes.map((code) => (
                     <tr key={code.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="font-mono text-sm text-gray-900">{code.code}</span>

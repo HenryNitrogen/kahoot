@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
-import { UserService } from '@/lib/userService';
-import { RedeemCodeService } from '@/lib/redeemCodeService';
+import { prisma } from '@/lib/prisma';
 
 // 验证管理员权限
 async function verifyAdmin(request: NextRequest) {
@@ -11,15 +10,16 @@ async function verifyAdmin(request: NextRequest) {
   }
 
   const token = authHeader.substring(7);
-  const decoded = verifyToken(token);
+  const decoded = await verifyToken(token);
   if (!decoded) {
     throw new Error('无效的授权令牌');
   }
 
-  const user = await UserService.getUserById(decoded.userId);
-  
-  // 检查是否为指定管理员邮箱
-  if (user.email !== 'henryni710@gmail.com') {
+  const user = await prisma.user.findUnique({
+    where: { id: decoded.userId as string }
+  });
+
+  if (!user || !user.isAdmin) {
     throw new Error('权限不足');
   }
 
@@ -31,11 +31,54 @@ export async function GET(request: NextRequest) {
   try {
     await verifyAdmin(request);
 
-    const stats = await RedeemCodeService.getRedemptionStats();
+    // 获取统计数据
+    const [
+      totalUsers,
+      activeUsers,
+      totalCodes,
+      usedCodes,
+      activeCodes,
+      totalRedemptions
+    ] = await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({
+        where: {
+          usageRecords: {
+            some: {
+              lastRequestDate: {
+                gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30天内有活动
+              }
+            }
+          }
+        }
+      }),
+      prisma.redeemCode.count(),
+      prisma.redeemCode.count({ where: { isUsed: true } }),
+      prisma.redeemCode.count({ 
+        where: { 
+          isUsed: false,
+          OR: [
+            { expiresAt: null },
+            { expiresAt: { gt: new Date() } }
+          ]
+        } 
+      }),
+      prisma.redemption.count()
+    ]);
+
+    const expiredCodes = totalCodes - usedCodes - activeCodes;
     
     return NextResponse.json({
       success: true,
-      stats
+      stats: {
+        totalUsers,
+        activeUsers,
+        totalCodes,
+        usedCodes,
+        activeCodes,
+        expiredCodes,
+        totalRedemptions
+      }
     });
 
   } catch (error) {

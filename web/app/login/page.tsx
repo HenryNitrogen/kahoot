@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Zap, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useTranslations } from '@/lib/i18n';
+import ReCaptcha from '@/components/ReCaptcha';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -11,6 +13,8 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const { translations, language, setLanguage, loading: i18nLoading } = useTranslations();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -18,13 +22,23 @@ export default function Login() {
     setLoading(true);
     setError('');
 
+    if (!recaptchaToken) {
+      setError('Please complete the reCAPTCHA verification');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email, 
+          password,
+          recaptchaToken 
+        }),
       });
 
       const data = await response.json();
@@ -33,13 +47,19 @@ export default function Login() {
         localStorage.setItem('authToken', data.token);
         router.push('/dashboard');
       } else {
-        setError(data.error || '登录失败');
+        setError(data.error || translations.loginFailed);
+        setRecaptchaToken(null); // Reset reCAPTCHA on error
       }
     } catch (err) {
-      setError('网络错误，请重试');
+      setError(translations.networkError);
+      setRecaptchaToken(null); // Reset reCAPTCHA on error
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRecaptchaChange = (token: string | null) => {
+    setRecaptchaToken(token);
   };
 
   return (
@@ -50,10 +70,10 @@ export default function Login() {
           <div className="text-center mb-8">
             <Link href="/" className="inline-flex items-center space-x-2 mb-6">
               <Zap className="h-8 w-8 text-indigo-600" />
-              <span className="text-2xl font-bold text-gray-900">Kahoot助手</span>
+              <span className="text-2xl font-bold text-gray-900">KQH</span>
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">欢迎回来</h1>
-            <p className="text-gray-600">登录到你的账户</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{translations.welcomeBack}</h1>
+            <p className="text-gray-600">{translations.loginToAccount}</p>
           </div>
 
           {/* Error Message */}
@@ -67,7 +87,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-                邮箱地址
+                {translations.emailAddress}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -78,14 +98,14 @@ export default function Login() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                  placeholder="请输入您的邮箱"
+                  placeholder={translations.enterEmail}
                 />
               </div>
             </div>
 
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-                密码
+                {translations.password}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -96,7 +116,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-colors"
-                  placeholder="请输入您的密码"
+                  placeholder={translations.enterPassword}
                 />
                 <button
                   type="button"
@@ -113,28 +133,36 @@ export default function Login() {
                 href="/forgot-password"
                 className="text-sm text-indigo-600 hover:text-indigo-700 transition-colors"
               >
-                忘记密码？
+                {translations.forgotPassword}
               </Link>
+            </div>
+
+            {/* reCAPTCHA */}
+            <div className="flex justify-center">
+              <ReCaptcha 
+                onVerify={handleRecaptchaChange}
+                onExpired={() => setRecaptchaToken(null)}
+              />
             </div>
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !recaptchaToken}
               className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {loading ? '登录中...' : '登录'}
+              {loading ? translations.loggingIn : translations.loginButton}
             </button>
           </form>
 
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-gray-600">
-              还没有账户？
+              {translations.noAccount}
               <Link
                 href="/register"
                 className="text-indigo-600 hover:text-indigo-700 font-medium ml-1"
               >
-                立即注册
+                {translations.createAccount}
               </Link>
             </p>
           </div>

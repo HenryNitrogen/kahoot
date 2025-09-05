@@ -101,6 +101,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/test-extension">
 }
 
+// Validate ../../app/test-ip/page.tsx
+{
+  const handler = {} as typeof import("../../app/test-ip/page.js")
+  handler satisfies AppPageConfig<"/test-ip">
+}
+
 // Validate ../../app/test/page.tsx
 {
   const handler = {} as typeof import("../../app/test/page.js")
@@ -123,6 +129,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/api/admin/dashboard/route.js")
   handler satisfies RouteHandlerConfig<"/api/admin/dashboard">
+}
+
+// Validate ../../app/api/admin/users/route.ts
+{
+  const handler = {} as typeof import("../../app/api/admin/users/route.js")
+  handler satisfies RouteHandlerConfig<"/api/admin/users">
 }
 
 // Validate ../../app/api/ai/answer/route.ts
@@ -177,6 +189,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/api/redeem/route.js")
   handler satisfies RouteHandlerConfig<"/api/redeem">
+}
+
+// Validate ../../app/api/usage/history/route.ts
+{
+  const handler = {} as typeof import("../../app/api/usage/history/route.js")
+  handler satisfies RouteHandlerConfig<"/api/usage/history">
 }
 
 
