@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
 
 interface ReCaptchaProps {
@@ -19,6 +19,7 @@ export default function ReCaptcha({
   className = ''
 }: ReCaptchaProps) {
   const recaptchaRef = useRef<ReCAPTCHA>(null);
+  const [hasError, setHasError] = useState(false);
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 
   useEffect(() => {
@@ -31,10 +32,15 @@ export default function ReCaptcha({
 
   if (!siteKey) {
     console.error('reCAPTCHA site key not found in environment variables');
-    return null;
+    return (
+      <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+        <p className="text-yellow-800 text-sm">reCAPTCHA not configured. Please contact administrator.</p>
+      </div>
+    );
   }
 
   const handleChange = (token: string | null) => {
+    setHasError(false);
     onVerify(token);
   };
 
@@ -45,10 +51,36 @@ export default function ReCaptcha({
     }
   };
 
-  const handleError = () => {
+  const handleError = (error?: any) => {
+    setHasError(true);
     onVerify(null);
-    console.error('reCAPTCHA error occurred');
+    console.error('reCAPTCHA error occurred:', error);
+    console.error('Site key being used:', siteKey);
+    console.error('Make sure the site key is for reCAPTCHA v2 (not v3) and the domain is correctly configured');
   };
+
+  // If there's an error, show a fallback message
+  if (hasError) {
+    return (
+      <div className={`recaptcha-container ${className}`}>
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-800 text-sm mb-2">reCAPTCHA verification failed to load.</p>
+          <button
+            onClick={() => {
+              setHasError(false);
+              // For development, allow bypass
+              if (process.env.NODE_ENV === 'development') {
+                onVerify('development-bypass-token');
+              }
+            }}
+            className="text-blue-600 hover:text-blue-700 text-sm underline"
+          >
+            Retry reCAPTCHA
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`recaptcha-container ${className}`}>
