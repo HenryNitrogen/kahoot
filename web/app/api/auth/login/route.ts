@@ -15,20 +15,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 验证reCAPTCHA
-    if (!recaptchaToken) {
-      return NextResponse.json(
-        { error: 'Please complete the reCAPTCHA verification' },
-        { status: 400 }
-      );
+    // 检查是否为扩展请求
+    const isExtensionRequest = request.headers.get('x-source') === 'extension';
+    
+    if (isExtensionRequest) {
+      console.log('🔗 Extension login request detected - skipping reCAPTCHA');
     }
 
-    const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
-    if (!isRecaptchaValid) {
-      return NextResponse.json(
-        { error: 'reCAPTCHA verification failed' },
-        { status: 400 }
-      );
+    // 验证reCAPTCHA (扩展请求跳过)
+    if (!isExtensionRequest) {
+      if (!recaptchaToken) {
+        return NextResponse.json(
+          { error: 'Please complete the reCAPTCHA verification' },
+          { status: 400 }
+        );
+      }
+
+      const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
+      if (!isRecaptchaValid) {
+        return NextResponse.json(
+          { error: 'reCAPTCHA verification failed' },
+          { status: 400 }
+        );
+      }
     }
 
     // 验证邮箱格式

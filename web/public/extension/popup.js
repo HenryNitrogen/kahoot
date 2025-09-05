@@ -227,7 +227,8 @@
             const response = await fetch(`${config.apiUrl}/auth/login`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Source': 'extension'
                 },
                 body: JSON.stringify({ email, password })
             });
@@ -292,7 +293,8 @@
             const response = await fetch(`${config.apiUrl}/auth/register`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'X-Source': 'extension'
                 },
                 body: JSON.stringify({ name, email, password })
             });
