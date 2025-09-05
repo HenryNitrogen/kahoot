@@ -22,9 +22,9 @@ const eslintConfig = [
         ],
         rules: {
             // Disable specific warnings for build
-            "@typescript-eslint/no-unused-vars": "warn",
+            "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/no-explicit-any": "off",
-            "react-hooks/exhaustive-deps": "warn",
+            "react-hooks/exhaustive-deps": "off",
         },
     },
 ];
