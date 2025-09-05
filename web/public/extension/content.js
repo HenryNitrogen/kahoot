@@ -1,15 +1,15 @@
-// content.js - Chrome扩展内容脚本
+// content.js - Chrome Extension Content Script
 (function() {
         'use strict';
 
-        // 配置信息
+        // Configuration
         const config = {
-            apiUrl: 'https://kahoot.henryni.cn/api', // 开发环境，生产环境需要修改
+            apiUrl: 'https://kahoot.henryni.cn/api', // Development environment, needs modification for production
 
             version: '1.0.0'
         };
 
-        // 用户状态
+        // User status
         let userAuth = {
             token: null,
             isLoggedIn: false,
@@ -17,7 +17,7 @@
             usage: null
         };
 
-        // Quiz数据
+        // Quiz data
         let quizData = {
             currentQuestion: '',
             currentChoices: [],
@@ -37,9 +37,9 @@
 
         let lastQuestion = '';
         let lastChoices = [];
-        let currentAnswer = '等待登录...';
+        let currentAnswer = 'Waiting for login...';
 
-        // 从本地存储中获取用户认证信息（使用localStorage代替chrome.storage）
+        // Load user authentication from local storage (use localStorage instead of chrome.storage)
         async function loadUserAuth() {
             try {
                 const authToken = localStorage.getItem('kahoot_smart_auth_token');
@@ -50,40 +50,40 @@
                     userAuth.isLoggedIn = true;
                     const parsedUserInfo = JSON.parse(userInfo);
                     userAuth.userPlan = parsedUserInfo.plan || 'free';
-                    currentAnswer = '等待题目...';
-                    console.log('用户已登录:', parsedUserInfo.email);
+                    currentAnswer = 'Waiting for question...';
+                    console.log('User logged in:', parsedUserInfo.email);
                 } else {
-                    currentAnswer = '请在扩展中登录使用智能功能';
-                    console.log('用户未登录');
+                    currentAnswer = 'Please login in extension to use smart features';
+                    console.log('User not logged in');
                 }
             } catch (error) {
-                console.error('加载用户认证失败:', error);
-                currentAnswer = '认证加载失败';
+                console.error('Failed to load user auth:', error);
+                currentAnswer = 'Auth loading failed';
             }
         }
 
-        // 保存用户认证信息
+        // Save user authentication info
         async function saveUserAuth(token, userInfo) {
             localStorage.setItem('kahoot_smart_auth_token', token);
             localStorage.setItem('kahoot_smart_user_info', JSON.stringify(userInfo));
             userAuth.token = token;
             userAuth.isLoggedIn = true;
             userAuth.userPlan = userInfo.plan || 'free';
-            console.log('用户认证已保存');
+            console.log('User auth saved');
         }
 
-        // 清除用户认证信息
+        // Clear user authentication info
         async function clearUserAuth() {
             localStorage.removeItem('kahoot_smart_auth_token');
             localStorage.removeItem('kahoot_smart_user_info');
             userAuth.token = null;
             userAuth.isLoggedIn = false;
             userAuth.userPlan = 'free';
-            currentAnswer = '请在扩展中登录使用智能功能';
-            console.log('用户认证已清除');
+            currentAnswer = 'Please login in extension to use smart features';
+            console.log('User auth cleared');
         }
 
-        // 获取用户使用情况
+        // Get user usage
         async function getUserUsage() {
             if (!userAuth.token) return null;
 
@@ -103,15 +103,15 @@
                     return data;
                 }
             } catch (error) {
-                console.error('获取使用情况失败:', error);
+                console.error('Failed to get usage info:', error);
             }
             return null;
         }
 
-        // 调用智能服务获取答案
+        // Call smart service to get answer
         async function getSmartAnswer(question, choices, answersAllowed) {
             if (!userAuth.token) {
-                return '请在扩展弹窗中登录以使用智能功能';
+                return 'Please login in extension popup to use smart features';
             }
 
             try {
@@ -133,31 +133,31 @@
                 if (!response.ok) {
                     if (response.status === 401) {
                         await clearUserAuth();
-                        return '登录已过期，请重新登录';
+                        return 'Login expired, please login again';
                     } else if (response.status === 429) {
-                        const planName = data.limits?.plan === 'free' ? '免费用户' :
-                            data.limits?.plan === 'premium' ? 'Premium会员' : '年费会员';
-                        return `使用次数已达上限！当前计划：${planName}，请升级会员或等待重置`;
+                        const planName = data.limits?.plan === 'free' ? 'Free User' :
+                            data.limits?.plan === 'premium' ? 'Premium Member' : 'Annual Member';
+                        return `Usage limit reached! Current plan: ${planName}, please upgrade or wait for reset`;
                     } else {
-                        return `错误：${data.error || '未知错误'}`;
+                        return `Error: ${data.error || 'Unknown error'}`;
                     }
                 }
 
-                // 更新用户信息
+                // Update user info
                 userAuth.userPlan = data.userPlan;
-                const planName = data.userPlan === 'free' ? '免费用户' :
-                    data.userPlan === 'premium' ? 'Premium会员' : '年费会员';
+                const planName = data.userPlan === 'free' ? 'Free User' :
+                    data.userPlan === 'premium' ? 'Premium Member' : 'Annual Member';
 
-                return `${data.answer}\n\n[${planName}] 置信度: ${Math.round((data.confidence || 0.85) * 100)}%`;
+                return `${data.answer}\n\n[${planName}] Confidence: ${Math.round((data.confidence || 0.85) * 100)}%`;
             } catch (error) {
-                console.error('智能请求失败:', error);
-                return `网络错误：${error.message}`;
+                console.error('Smart request failed:', error);
+                return `Network error: ${error.message}`;
             }
         }
 
-        // 创建可拖拽的UI元素
+        // Create draggable UI element
         function createDraggableElement(id, initialTop, initialLeft, isMenu = false) {
-            // 获取保存的缩放比例
+            // Get saved scale ratio
             const savedScale = localStorage.getItem(`kahoot_smart_${id}_scale`) || '1';
             const scale = parseFloat(savedScale);
 
@@ -195,19 +195,19 @@
             header.style.marginBottom = '12px';
             header.style.border = '1px solid rgba(255, 255, 255, 0.15)';
 
-            const title = isMenu ? '⚙️ 智能助手设置' : '🤖 Kahoot智能助手';
+            const title = isMenu ? '⚙️ KQH Settings' : '🤖 KQH - Kahoot Quiz Helper';
             header.innerHTML = `<strong style="font-size: 16px; background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">${title}</strong>`;
 
-            // 创建控制按钮容器
+            // Create control buttons container
             let controlsContainer = document.createElement('div');
             controlsContainer.style.float = 'right';
             controlsContainer.style.display = 'flex';
             controlsContainer.style.gap = '4px';
 
-            // 缩放减小按钮
+            // Scale down button
             let scaleDownBtn = document.createElement('button');
             scaleDownBtn.innerText = '−';
-            scaleDownBtn.title = '缩小';
+            scaleDownBtn.title = 'Zoom out';
             scaleDownBtn.style.background = 'rgba(255, 255, 255, 0.15)';
             scaleDownBtn.style.backdropFilter = 'blur(10px)';
             scaleDownBtn.style.webkitBackdropFilter = 'blur(10px)';
@@ -219,7 +219,7 @@
             scaleDownBtn.style.fontSize = '12px';
             scaleDownBtn.style.transition = 'all 0.3s ease';
 
-            // 缩放显示
+            // Scale display
             let scaleDisplay = document.createElement('span');
             scaleDisplay.style.background = 'rgba(255, 255, 255, 0.1)';
             scaleDisplay.style.padding = '2px 6px';
@@ -228,10 +228,10 @@
             scaleDisplay.style.opacity = '0.8';
             scaleDisplay.textContent = Math.round(scale * 100) + '%';
 
-            // 缩放增大按钮
+            // Scale up button
             let scaleUpBtn = document.createElement('button');
             scaleUpBtn.innerText = '+';
-            scaleUpBtn.title = '放大';
+            scaleUpBtn.title = 'Zoom in';
             scaleUpBtn.style.background = 'rgba(255, 255, 255, 0.15)';
             scaleUpBtn.style.backdropFilter = 'blur(10px)';
             scaleUpBtn.style.webkitBackdropFilter = 'blur(10px)';
@@ -243,10 +243,10 @@
             scaleUpBtn.style.fontSize = '12px';
             scaleUpBtn.style.transition = 'all 0.3s ease';
 
-            // 最小化按钮
+            // Minimize button
             let minimizeBtn = document.createElement('button');
             minimizeBtn.innerText = '−';
-            minimizeBtn.title = '最小化';
+            minimizeBtn.title = 'Minimize';
             minimizeBtn.style.background = 'rgba(255, 255, 255, 0.15)';
             minimizeBtn.style.backdropFilter = 'blur(10px)';
             minimizeBtn.style.webkitBackdropFilter = 'blur(10px)';
@@ -278,7 +278,7 @@
 
             document.body.appendChild(div);
 
-            // 悬停效果
+            // Hover effect
             div.addEventListener('mouseenter', () => {
                 div.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.1) 100%)';
                 div.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3)';
@@ -289,7 +289,7 @@
                 div.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
             });
 
-            // 按钮悬停效果
+            // Button hover effect
             [scaleDownBtn, scaleUpBtn, minimizeBtn].forEach(btn => {
                 btn.addEventListener('mouseenter', () => {
                     btn.style.background = 'rgba(255, 255, 255, 0.25)';
@@ -302,11 +302,11 @@
                 });
             });
 
-            // 缩放功能
+            // Scaling functionality
             let currentScale = scale;
 
             const updateScale = (newScale) => {
-                newScale = Math.max(0.5, Math.min(2, newScale)); // 限制缩放范围在0.5x到2x之间
+                newScale = Math.max(0.5, Math.min(2, newScale)); // Limit scale range between 0.5x to 2x
                 currentScale = newScale;
                 div.style.transform = `scale(${currentScale})`;
                 scaleDisplay.textContent = Math.round(currentScale * 100) + '%';
@@ -323,7 +323,7 @@
                 updateScale(currentScale + 0.1);
             });
 
-            // 鼠标滚轮缩放（按住Ctrl键时）
+            // Mouse wheel scaling (when holding Ctrl key)
             div.addEventListener('wheel', (e) => {
                 if (e.ctrlKey) {
                     e.preventDefault();
@@ -332,7 +332,7 @@
                 }
             });
 
-            // 拖拽功能
+            // Drag functionality
             let isDragging = false;
             let currentX, currentY;
 
@@ -356,7 +356,7 @@
                 div.style.cursor = 'default';
             });
 
-            // 最小化功能
+            // Minimize functionality
             let isMinimized = false;
             minimizeBtn.addEventListener('click', () => {
                 isMinimized = !isMinimized;
@@ -368,23 +368,23 @@
             return content;
         }
 
-        // 创建设置菜单
+        // Create settings menu
         function createMenu() {
             let menuContent = createDraggableElement('quizMenu', '10px', 'calc(100% - 300px)', true);
 
-            // 根据登录状态显示不同内容
+            // Show different content based on login status
             if (!userAuth.isLoggedIn) {
                 menuContent.innerHTML = `
                     <div style="text-align: center; padding: 20px;">
                         <div style="font-size: 18px; margin-bottom: 16px;">🔐</div>
                         <div style="margin-bottom: 16px; opacity: 0.9;">
-                            <strong>需要登录使用智能功能</strong>
+                            <strong>Login required to use smart features</strong>
                         </div>
                         <div style="font-size: 13px; opacity: 0.7; margin-bottom: 20px;">
-                            请点击扩展图标进行登录
+                            Please click the extension icon to login
                         </div>
                         <div style="background: rgba(255, 255, 255, 0.1); padding: 12px; border-radius: 8px; font-size: 12px; opacity: 0.8;">
-                            💡 提示：点击浏览器工具栏中的扩展图标，然后登录您的账户即可使用智能答题功能
+                            💡 Tip: Click the extension icon in your browser toolbar, then login to your account to use smart answering features
                         </div>
                     </div>
                 `;
@@ -393,34 +393,34 @@
                     <div style="margin-bottom: 20px;">
                         <div style="display: flex; align-items: center; margin-bottom: 12px;">
                             <div style="width: 8px; height: 8px; border-radius: 50%; background: #4CAF50; margin-right: 8px;"></div>
-                            <strong>账户状态: 已登录</strong>
+                            <strong>Account Status: Logged In</strong>
                         </div>
                         <div style="font-size: 13px; opacity: 0.8; background: rgba(255, 255, 255, 0.1); padding: 10px; border-radius: 8px;">
-                            计划: <span id="menuUserPlan" style="font-weight: bold;">${userAuth.userPlan.toUpperCase()}</span><br>
-                            <span id="menuUsageInfo" style="font-size: 12px; opacity: 0.7;">正在获取使用情况...</span>
+                            Plan: <span id="menuUserPlan" style="font-weight: bold;">${userAuth.userPlan.toUpperCase()}</span><br>
+                            <span id="menuUsageInfo" style="font-size: 12px; opacity: 0.7;">Getting usage info...</span>
                         </div>
                     </div>
 
                     <div style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px;">
-                        <strong style="margin-bottom: 12px; display: block;">显示选项:</strong>
+                        <strong style="margin-bottom: 12px; display: block;">Display Options:</strong>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 13px;">
                             <label style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 6px; cursor: pointer;">
-                                <input type="checkbox" id="showImage" checked style="margin-right: 8px;"> 显示图片
+                                <input type="checkbox" id="showImage" checked style="margin-right: 8px;"> Show Image
                             </label>
                             <label style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 6px; cursor: pointer;">
-                                <input type="checkbox" id="showVideo" checked style="margin-right: 8px;"> 显示视频
+                                <input type="checkbox" id="showVideo" checked style="margin-right: 8px;"> Show Video
                             </label>
                             <label style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 6px; cursor: pointer;">
-                                <input type="checkbox" id="showLayout" checked style="margin-right: 8px;"> 显示布局
+                                <input type="checkbox" id="showLayout" checked style="margin-right: 8px;"> Show Layout
                             </label>
                             <label style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 6px; cursor: pointer;">
-                                <input type="checkbox" id="showTime" checked style="margin-right: 8px;"> 显示时间
+                                <input type="checkbox" id="showTime" checked style="margin-right: 8px;"> Show Time
                             </label>
                             <label style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 6px; cursor: pointer;">
-                                <input type="checkbox" id="showAnswersAllowed" checked style="margin-right: 8px;"> 答案数
+                                <input type="checkbox" id="showAnswersAllowed" checked style="margin-right: 8px;"> Answer Count
                             </label>
                             <label style="display: flex; align-items: center; background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 6px; cursor: pointer;">
-                                <input type="checkbox" id="showChoicesCount" checked style="margin-right: 8px;"> 选项数
+                                <input type="checkbox" id="showChoicesCount" checked style="margin-right: 8px;"> Choice Count
                             </label>
                         </div>
                     </div>
@@ -433,24 +433,24 @@
                             backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
                             border: 1px solid rgba(255, 255, 255, 0.3);
                             transition: all 0.3s ease;">
-                            刷新使用情况
+                            Refresh Usage
                         </button>
                     </div>
                 `;
 
-                // 绑定刷新按钮
+                // Bind refresh button
                 const refreshBtn = document.getElementById('refreshUsageBtn');
                 if (refreshBtn) {
                     refreshBtn.addEventListener('click', async() => {
                         refreshBtn.style.opacity = '0.6';
-                        refreshBtn.textContent = '刷新中...';
+                        refreshBtn.textContent = 'Refreshing...';
                         await updateMenuUsageInfo();
                         refreshBtn.style.opacity = '1';
-                        refreshBtn.textContent = '刷新使用情况';
+                        refreshBtn.textContent = 'Refresh Usage';
                     });
                 }
 
-                // 绑定显示选项复选框
+                // Bind display options checkboxes
                 ['showImage', 'showVideo', 'showLayout', 'showTime', 'showAnswersAllowed', 'showChoicesCount'].forEach(id => {
                     let checkbox = document.getElementById(id);
                     if (checkbox) {
@@ -467,7 +467,7 @@
             }
         }
 
-        // 更新菜单中的使用情况显示
+        // Update usage info in menu
         async function updateMenuUsageInfo() {
             const menuUsageInfo = document.getElementById('menuUsageInfo');
             const menuUserPlan = document.getElementById('menuUserPlan');
@@ -478,37 +478,37 @@
                     menuUserPlan.textContent = usage.userPlan.toUpperCase();
 
                     if (usage.userPlan === 'free') {
-                        menuUsageInfo.innerHTML = `累计使用: ${usage.usage.total}/${usage.limits.total} 次`;
+                        menuUsageInfo.innerHTML = `Total usage: ${usage.usage.total}/${usage.limits.total} times`;
                     } else {
-                        const planName = usage.userPlan === 'premium' ? 'Premium会员' : '年费会员';
+                        const planName = usage.userPlan === 'premium' ? 'Premium Member' : 'Annual Member';
                         menuUsageInfo.innerHTML = `
                         ${planName}<br>
-                        本月使用: ${usage.usage.thisMonth}/${usage.limits.monthly} 次<br>
-                        累计使用: ${usage.usage.total} 次
+                        This month: ${usage.usage.thisMonth}/${usage.limits.monthly} times<br>
+                        Total usage: ${usage.usage.total} times
                     `;
                     }
                 } else {
-                    menuUsageInfo.innerHTML = '获取使用情况失败';
+                    menuUsageInfo.innerHTML = 'Failed to get usage info';
                 }
             }
         }
 
-        // 更新显示框
-        function updateDisplayBox(data, answer = '等待题目...') {
+        // Update display box
+        function updateDisplayBox(data, answer = 'Waiting for question...') {
             let displayContent = document.getElementById('quizInfoBoxContent') || createDraggableElement('quizInfoBox', '10px', '10px');
 
             if (!data.currentQuestion || data.currentChoices.length === 0) {
                 displayContent.innerHTML = `
                 <div style="text-align: center; padding: 24px;">
                     <div style="font-size: 24px; margin-bottom: 16px;">🔍</div>
-                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">等待Kahoot题目...</div>
+                    <div style="font-size: 16px; font-weight: 600; margin-bottom: 12px;">Waiting for Kahoot question...</div>
                     <div style="font-size: 13px; opacity: 0.8; line-height: 1.5;">
-                        • 确保你在 kahoot.it 游戏页面<br>
-                        • 等待题目出现<br>
-                        • 如有问题请刷新页面
+                        • Make sure you're on kahoot.it game page<br>
+                        • Wait for question to appear<br>
+                        • Refresh page if having issues
                     </div>
                     <div style="margin-top: 20px; padding: 12px; background: rgba(255, 255, 255, 0.1); border-radius: 8px; font-size: 12px; opacity: 0.7;">
-                        💡 点击扩展图标登录以使用智能答题功能
+                        💡 Click extension icon to login for smart answering features
                     </div>
                 </div>
             `;
@@ -523,7 +523,7 @@
             <div style="margin-bottom: 20px;">
                 <div style="display: flex; align-items: center; margin-bottom: 12px;">
                     <div style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 600;">
-                        题目 ${data.questionIndex + 1}/${data.totalQuestions}
+                        Question ${data.questionIndex + 1}/${data.totalQuestions}
                     </div>
                 </div>
                 <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 16px; border-radius: 12px; margin: 8px 0; border: 1px solid rgba(255, 255, 255, 0.2);">
@@ -532,7 +532,7 @@
             </div>
             
             <div style="margin-bottom: 20px;">
-                <div style="font-weight: 600; margin-bottom: 8px; opacity: 0.9;">🔤 选项:</div>
+                <div style="font-weight: 600; margin-bottom: 8px; opacity: 0.9;">🔤 Options:</div>
                 <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);">
                     ${choicesText}
                 </div>
@@ -545,7 +545,7 @@
                 <div style="margin-bottom: 16px;">
                     <img src="${data.imageUrl}" style="max-width:100%; height:auto; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);" /><br>
                     <div style="font-size: 11px; opacity: 0.7; margin-top: 6px;">
-                        图片: ${data.imageMetadata.contentType}, ${data.imageMetadata.width}x${data.imageMetadata.height}
+                        Image: ${data.imageMetadata.contentType}, ${data.imageMetadata.width}x${data.imageMetadata.height}
                     </div>
                 </div>
             `;
@@ -554,16 +554,16 @@
             if ((localStorage.getItem('kahoot_smart_showVideo') !== 'false') && data.videoUrl) {
                 html += `
                 <div style="margin-bottom: 12px; padding: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
-                    🎥 视频: <a href="${data.videoUrl}" target="_blank" style="color: #64b5f6; text-decoration: none;">${data.videoService} 链接</a>
+                    🎥 Video: <a href="${data.videoUrl}" target="_blank" style="color: #64b5f6; text-decoration: none;">${data.videoService} Link</a>
                 </div>
             `;
             }
 
             const optionalFields = [
-                { id: 'showLayout', label: '📐', text: '布局', value: data.layout },
-                { id: 'showTime', label: '⏱️', text: '答题时间', value: `${data.timeAvailable / 1000}秒` },
-                { id: 'showAnswersAllowed', label: '✅', text: '允许答案数', value: data.numberOfAnswersAllowed },
-                { id: 'showChoicesCount', label: '🔢', text: '选项数量', value: data.numberOfChoices }
+                { id: 'showLayout', label: '📐', text: 'Layout', value: data.layout },
+                { id: 'showTime', label: '⏱️', text: 'Answer Time', value: `${data.timeAvailable / 1000}s` },
+                { id: 'showAnswersAllowed', label: '✅', text: 'Answers Allowed', value: data.numberOfAnswersAllowed },
+                { id: 'showChoicesCount', label: '🔢', text: 'Choice Count', value: data.numberOfChoices }
             ];
 
             const visibleFields = optionalFields.filter(field =>
@@ -584,9 +584,9 @@
                 html += '</div>';
             }
 
-            // 智能答案部分
-            const isError = answer.includes('错误') || answer.includes('失败') || answer.includes('请在扩展') || answer.includes('请先登录');
-            const isLoading = answer.includes('正在思考');
+            // Smart answer section
+            const isError = answer.includes('Error') || answer.includes('failed') || answer.includes('Please login') || answer.includes('Login required');
+            const isLoading = answer.includes('analyzing');
 
             let answerStyle = '';
             let answerIcon = '';
@@ -606,7 +606,7 @@
             <div style="margin-top: 20px; padding: 16px; ${answerStyle} backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.2);">
                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
                     <span style="font-size: 16px; margin-right: 8px;">${answerIcon}</span>
-                    <strong style="font-size: 15px; opacity: 0.95;">智能推荐答案</strong>
+                    <strong style="font-size: 15px; opacity: 0.95;">KQH Recommended Answer</strong>
                 </div>
                 <div style="font-weight: 600; line-height: 1.4; font-size: 14px;">
                     ${answer}
@@ -617,28 +617,28 @@
             displayContent.innerHTML = html;
         }
 
-        // 监听来自popup的消息 - 使用window postMessage代替chrome.runtime
+        // Listen for messages from popup - use window postMessage instead of chrome.runtime
         window.addEventListener('message', (event) => {
             if (event.source !== window) return;
 
             if (event.data.type === 'FROM_EXTENSION') {
                 if (event.data.action === 'login') {
                     saveUserAuth(event.data.token, event.data.userInfo).then(() => {
-                        currentAnswer = '登录成功！等待题目...';
+                        currentAnswer = 'Login successful! Waiting for question...';
                         updateDisplayBox(quizData, currentAnswer);
                     });
                 } else if (event.data.action === 'logout') {
                     clearUserAuth().then(() => {
-                        updateDisplayBox(quizData, '请登录使用AI功能');
+                        updateDisplayBox(quizData, 'Please login to use AI features');
                     });
                 }
             }
         });
 
-        // WebSocket拦截
+        // WebSocket interception
         const originalWebSocket = window.WebSocket;
         window.WebSocket = function(url) {
-            console.log('🔌 WebSocket连接:', url);
+            console.log('🔌 WebSocket connection:', url);
             const ws = new originalWebSocket(url);
 
             ws.addEventListener('message', async function(event) {
@@ -648,7 +648,7 @@
                         if (message.data && message.data.type === 'message' && message.channel === '/service/player') {
                             const content = JSON.parse(message.data.content);
                             if (content.type === 'quiz') {
-                                // 更新quiz数据 
+                                // Update quiz data 
                                 quizData = {
                                     currentQuestion: content.title || '',
                                     currentChoices: (content.choices || []).map(choice => choice.answer),
@@ -666,20 +666,20 @@
                                     getReadyTime: content.getReadyTimeAvailable || 0
                                 };
 
-                                console.log('📝 新题目:', quizData.currentQuestion);
+                                console.log('📝 New question:', quizData.currentQuestion);
 
                                 if (quizData.currentQuestion && quizData.currentChoices.length > 0) {
-                                    // 检查是否是新题目
+                                    // Check if it's a new question
                                     if (quizData.currentQuestion !== lastQuestion ||
                                         JSON.stringify(quizData.currentChoices) !== JSON.stringify(lastChoices)) {
 
                                         lastQuestion = quizData.currentQuestion;
                                         lastChoices = quizData.currentChoices.slice();
-                                        currentAnswer = userAuth.isLoggedIn ? '� 智能系统正在分析...' : '请在扩展中登录使用智能功能';
+                                        currentAnswer = userAuth.isLoggedIn ? '🧠 Smart system analyzing...' : 'Please login in extension to use smart features';
 
                                         updateDisplayBox(quizData, currentAnswer);
 
-                                        // 获取智能答案
+                                        // Get smart answer
                                         if (userAuth.isLoggedIn) {
                                             try {
                                                 const smartAnswer = await getSmartAnswer(
@@ -690,8 +690,8 @@
                                                 currentAnswer = smartAnswer;
                                                 updateDisplayBox(quizData, currentAnswer);
                                             } catch (error) {
-                                                console.error('获取智能答案失败:', error);
-                                                currentAnswer = `获取智能答案失败: ${error.message}`;
+                                                console.error('Failed to get smart answer:', error);
+                                                currentAnswer = `Failed to get smart answer: ${error.message}`;
                                                 updateDisplayBox(quizData, currentAnswer);
                                             }
                                         }
@@ -703,38 +703,38 @@
                         }
                     }
                 } catch (e) {
-                    console.error('❌ 解析WebSocket消息错误:', e);
+                    console.error('❌ Error parsing WebSocket message:', e);
                 }
             });
 
             ws.addEventListener('error', (e) => {
-                console.error('❌ WebSocket错误:', e);
+                console.error('❌ WebSocket error:', e);
             });
 
             return ws;
         };
 
-        // 页面加载完成时初始化
+        // Initialize when page loads
         window.addEventListener('load', async function() {
-                    console.log('�� Kahoot智能助手加载中...');
+                    console.log('🤖 KQH - Kahoot Quiz Helper loading...');
 
-                    // 加载用户认证信息
+                    // Load user authentication info
                     await loadUserAuth();
 
-                    // 创建UI
+                    // Create UI
                     let displayContent = createDraggableElement('quizInfoBox', '10px', '10px');
                     displayContent.innerHTML = `
             <div style="text-align: center; padding: 28px;">
                 <div style="font-size: 28px; margin-bottom: 16px;">��</div>
                 <div style="font-size: 18px; font-weight: 600; margin-bottom: 12px; background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
-                    Kahoot智能助手已就绪
+                    KQH - Kahoot Quiz Helper Ready
                 </div>
                 <div style="font-size: 13px; opacity: 0.8; line-height: 1.5;">
-                    等待题目出现...
+                    Waiting for question to appear...
                 </div>
                 ${!userAuth.isLoggedIn ? `
                 <div style="margin-top: 16px; padding: 12px; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 8px; font-size: 12px; opacity: 0.8; border: 1px solid rgba(255, 255, 255, 0.15);">
-                    💡 点击扩展图标登录以使用智能答题功能
+                    💡 Click extension icon to login for smart answering features
                 </div>
                 ` : ''}
             </div>
@@ -742,8 +742,7 @@
         
         createMenu();
         
-        console.log('✅ Kahoot智能助手初始化完成');
+        console.log('✅ KQH - Kahoot Quiz Helper initialization complete');
     });
 
 })();
-

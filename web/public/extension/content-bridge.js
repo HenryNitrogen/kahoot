@@ -1,12 +1,12 @@
-// content-bridge.js - 用于桥接popup和主内容脚本的通信
-// 这个脚本运行在ISOLATED世界中，可以访问Chrome API
+// content-bridge.js - Bridge for communication between popup and main content script
+// This script runs in ISOLATED world and can access Chrome APIs
 
-// 监听来自popup的消息
+// Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    console.log('Bridge收到消息:', request);
+    console.log('Bridge received message:', request);
 
     if (request.action === 'login' || request.action === 'logout') {
-        // 将消息转发给主内容脚本
+        // Forward message to main content script
         window.postMessage({
             type: 'FROM_EXTENSION',
             action: request.action,
@@ -20,14 +20,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
 });
 
-// 监听来自主内容脚本的消息
+// Listen for messages from main content script
 window.addEventListener('message', (event) => {
     if (event.source !== window) return;
 
     if (event.data.type === 'TO_EXTENSION') {
-        // 将消息转发给popup或background
+        // Forward message to popup or background
         chrome.runtime.sendMessage(event.data);
     }
 });
 
-console.log('🌉 Kahoot AI 桥接脚本已加载');
+console.log('🌉 KQH Bridge script loaded');

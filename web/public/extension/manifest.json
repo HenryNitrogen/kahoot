@@ -1,12 +1,11 @@
 {
     "manifest_version": 3,
-    "name": "Kahoot智能助手",
+    "name": "KQH - Kahoot Quiz Helper",
     "version": "1.0.0",
-    "description": "智能驱动的Kahoot答题助手，提供智能答案推荐",
+    "description": "AI-powered Kahoot quiz helper with answer recommendations",
     "permissions": ["activeTab", "storage", "alarms"],
     "host_permissions": [
         "https://kahoot.it/*",
-        "http://localhost:3001/*",
         "https://api.henryni.cn/*",
         "https://kahoot.henryni.cn/*"
     ],
@@ -27,6 +26,6 @@
 
     "action": {
         "default_popup": "popup.html",
-        "default_title": "Kahoot智能助手"
+        "default_title": "KQH - Kahoot Quiz Helper"
     }
 }
