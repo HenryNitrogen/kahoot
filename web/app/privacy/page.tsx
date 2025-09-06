@@ -289,7 +289,7 @@ export default function Privacy() {
           '',
           '**数据保护官**：',
           '• 如适用，您也可以联系我们的数据保护官',
-          `• DPO邮箱：dpo@henryni.cn`,
+          `• DPO邮箱：henryni711@gmail.com`,
           '',
           '我们致力于及时、专业地处理您的隐私相关问题。'
         ]
@@ -571,7 +571,7 @@ export default function Privacy() {
           '',
           '**Data Protection Officer**:',
           '• If applicable, you may also contact our Data Protection Officer',
-          `• DPO Email: dpo@henryni.cn`,
+          `• DPO Email: henryni711@gmail.com`,
           '',
           'We are committed to handling your privacy-related issues in a timely and professional manner.'
         ]

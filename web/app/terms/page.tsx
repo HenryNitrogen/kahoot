@@ -10,7 +10,7 @@ export default function Terms() {
   const lastUpdated = language === 'zh' ? '2024年9月6日' : 'September 6, 2024';
   const appName = 'Kahoot AI Helper';
   const websiteUrl = 'https://kahoot.henryni.cn';
-  const contactEmail = 'support@henryni.cn';
+  const contactEmail = 'henryni710@gmail.com';
 
   const sections = {
     zh: [
