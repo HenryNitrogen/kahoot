@@ -94,6 +94,12 @@
       "namedRegex": "^/login(?:/)?$"
     },
     {
+      "page": "/payment/guide",
+      "regex": "^/payment/guide(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/payment/guide(?:/)?$"
+    },
+    {
       "page": "/payment/success",
       "regex": "^/payment/success(?:/)?$",
       "routeKeys": {},
@@ -160,6 +166,12 @@
       "namedRegex": "^/test\\-ip(?:/)?$"
     },
     {
+      "page": "/test-payment",
+      "regex": "^/test\\-payment(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/test\\-payment(?:/)?$"
+    },
+    {
       "page": "/test-payment-status",
       "regex": "^/test\\-payment\\-status(?:/)?$",
       "routeKeys": {},
@@ -170,6 +182,12 @@
       "regex": "^/test\\-recaptcha(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/test\\-recaptcha(?:/)?$"
+    },
+    {
+      "page": "/test-upgrade",
+      "regex": "^/test\\-upgrade(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/test\\-upgrade(?:/)?$"
     },
     {
       "page": "/tutorial",

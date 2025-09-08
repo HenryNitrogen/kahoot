@@ -75,9 +75,6 @@ export async function POST(request: NextRequest) {
  */
 async function handlePaymentSuccess(data: NotifyData) {
   try {
-    // TODO: 根据实际业务需求实现
-    // 这里可以添加具体的业务处理逻辑
-    
     console.log('处理支付成功业务逻辑:', {
       orderId: data.trade_order_id,
       amount: data.total_fee,
@@ -85,14 +82,91 @@ async function handlePaymentSuccess(data: NotifyData) {
       attach: data.attach,
     });
     
-    // 示例业务逻辑：
-    // 1. 更新订单状态
-    // 2. 增加用户积分/会员时长
-    // 3. 记录支付日志
-    // 4. 发送通知等
+    // 解析订单附加信息
+    let orderInfo: { plan?: string; userId?: string } = {};
+    try {
+      if (data.attach) {
+        orderInfo = JSON.parse(data.attach);
+      }
+    } catch (parseError) {
+      console.warn('解析订单附加信息失败:', parseError);
+    }
+    
+    // 如果是升级订单，更新用户订阅状态
+    if (orderInfo.plan && orderInfo.userId && data.trade_order_id.startsWith('UPGRADE_')) {
+      await updateUserSubscription(orderInfo.userId, orderInfo.plan, data);
+    }
+    
+    console.log(`[支付成功] 订单 ${data.trade_order_id} 处理完成`);
     
   } catch (error) {
     console.error('处理支付成功业务逻辑错误:', error);
     // 这里的错误不应该影响回调响应
+  }
+}
+
+/**
+ * 更新用户订阅状态
+ */
+async function updateUserSubscription(userId: string, plan: string, paymentData: NotifyData) {
+  try {
+    // TODO: 这里应该连接到实际的数据库
+    // 现在先打印日志，实际项目中需要实现数据库操作
+    
+    console.log(`[订阅更新] 开始更新用户订阅`, {
+      userId,
+      plan,
+      orderId: paymentData.trade_order_id,
+      amount: paymentData.total_fee,
+      transactionId: paymentData.transaction_id
+    });
+    
+    // 确定订阅类型和期限
+    const subscriptionPlan = plan === 'monthly' ? 'premium' : 'pro';
+    const duration = plan === 'monthly' ? 30 : 365; // 月度30天，年度365天
+    
+    // 计算到期时间
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + duration);
+    
+    console.log(`[订阅更新] 订阅详情`, {
+      userId,
+      subscriptionPlan,
+      duration: `${duration}天`,
+      expiresAt: expiresAt.toISOString(),
+      amount: paymentData.total_fee
+    });
+    
+    // TODO: 实际的数据库更新操作
+    // await prisma.user.update({
+    //   where: { id: userId },
+    //   data: {
+    //     subscription: {
+    //       upsert: {
+    //         create: {
+    //           plan: subscriptionPlan,
+    //           status: 'active',
+    //           expiresAt: expiresAt,
+    //           paymentId: paymentData.transaction_id,
+    //           amount: paymentData.total_fee
+    //         },
+    //         update: {
+    //           plan: subscriptionPlan,
+    //           status: 'active',
+    //           expiresAt: expiresAt,
+    //           paymentId: paymentData.transaction_id,
+    //           amount: paymentData.total_fee,
+    //           updatedAt: new Date()
+    //         }
+    //       }
+    //     }
+    //   }
+    // });
+    
+    console.log(`✅ [订阅更新] 用户 ${userId} 成功升级到 ${subscriptionPlan} 计划，有效期至 ${expiresAt.toLocaleDateString()}`);
+    
+  } catch (error) {
+    console.error(`❌ [订阅更新] 更新用户 ${userId} 订阅失败:`, error);
+    throw error;
   }
 }

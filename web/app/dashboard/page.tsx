@@ -49,20 +49,47 @@ interface UsageHistoryItem {
   timestamp: string;
   question: string;
   answer: string;
-  response_time: number;
-  success: boolean;
+  type: string;
 }
 
-export default function Dashboard() {
+interface UsageRecord {
+  id: string;
+  timestamp: string;
+  question: string;
+  answer: string;
+  type: string;
+  success?: boolean;
+  response_time?: number;
+}
+
+export default function DashboardPage() {
   const [user, setUser] = useState<UserData | null>(null);
+  const [error, setError] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('overview');
-  const [usageHistory, setUsageHistory] = useState<UsageHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [usageHistory, setUsageHistory] = useState<UsageRecord[]>([]);
+  const [showUpgradeSuccess, setShowUpgradeSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
   const [showHistory, setShowHistory] = useState(false);
-  const { translations, language, setLanguage, loading: i18nLoading } = useTranslations();
   const router = useRouter();
+  const { translations, loading: i18nLoading, language, setLanguage } = useTranslations();
+
+  // 检测升级成功
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('upgraded') === 'true') {
+      setShowUpgradeSuccess(true);
+      // 清理URL参数
+      const url = new URL(window.location.href);
+      url.searchParams.delete('upgraded');
+      window.history.replaceState({}, '', url.pathname);
+      
+      // 3秒后隐藏提示
+      setTimeout(() => {
+        setShowUpgradeSuccess(false);
+      }, 5000);
+    }
+  }, []);
 
   useEffect(() => {
     fetchUserData();
@@ -308,6 +335,34 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+        {/* 升级成功提示 */}
+        {showUpgradeSuccess && (
+          <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-xl p-6 animate-slideDown">
+            <div className="flex items-center space-x-4">
+              <div className="flex-shrink-0">
+                <CheckCircle className="h-12 w-12 text-green-600 animate-bounce" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-green-800 mb-2">
+                  🎉 升级成功！
+                </h3>
+                <p className="text-green-700">
+                  恭喜您！订阅已成功升级。现在您可以享受所有高级功能了。
+                  如果订阅状态未及时更新，请稍等几秒钟后刷新页面。
+                </p>
+              </div>
+              <button
+                onClick={() => setShowUpgradeSuccess(false)}
+                className="flex-shrink-0 text-green-600 hover:text-green-800 transition-colors"
+              >
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        )}
+        
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fadeIn">
             {/* 主要信息 */}

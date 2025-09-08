@@ -123,7 +123,14 @@ function CheckoutContent() {
 
   const handlePaymentSuccess = (data: any) => {
     console.log('支付成功:', data);
-    // 支付组件已经处理了跳转逻辑
+    
+    // 显示支付成功消息
+    alert(`🎉 支付成功！您已成功升级到 ${selectedPlanData.name}，请稍等片刻后刷新页面查看最新状态。`);
+    
+    // 延迟跳转到控制台，给订阅更新时间
+    setTimeout(() => {
+      router.push('/dashboard?upgraded=true');
+    }, 2000);
   };
 
   const handlePaymentError = (error: string) => {

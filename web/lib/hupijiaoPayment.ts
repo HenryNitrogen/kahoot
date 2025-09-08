@@ -73,6 +73,27 @@ export interface NotifyData {
   hash: string;
 }
 
+// 订单查询参数接口
+export interface QueryOrderOptions {
+  out_trade_order?: string;  // 商户订单号
+  open_order_id?: string;    // 虎皮椒内部订单号
+}
+
+// 订单查询响应接口
+export interface QueryOrderResponse {
+  success: boolean;
+  data?: {
+    status: 'OD' | 'WP' | 'CD' | 'RD' | 'UD'; // OD已支付，WP待支付，CD已取消，RD退款中，UD退款失败
+    open_order_id: string;
+    trade_order_id?: string;
+    total_fee?: number;
+    transaction_id?: string;
+    order_title?: string;
+    [key: string]: any;
+  };
+  error?: string;
+}
+
 /**
  * 生成签名哈希
  */
@@ -195,6 +216,71 @@ export class HupijiaoPayment {
     } catch (error) {
       console.error('处理虎皮椒支付回调错误:', error);
       return { success: false, message: '处理回调异常' };
+    }
+  }
+
+  /**
+   * 查询订单状态
+   */
+  async queryOrder(options: QueryOrderOptions): Promise<QueryOrderResponse> {
+    try {
+      // 检查参数，out_trade_order 和 open_order_id 二选一
+      if (!options.out_trade_order && !options.open_order_id) {
+        return {
+          success: false,
+          error: '必须提供 out_trade_order 或 open_order_id 其中一个参数'
+        };
+      }
+
+      // 构建查询参数
+      const params: any = {
+        appid: this.config.appid,
+        time: nowDate(),
+        nonce_str: generateNonceStr(),
+      };
+
+      // 添加订单标识参数
+      if (options.out_trade_order) {
+        params.out_trade_order = options.out_trade_order;
+      }
+      if (options.open_order_id) {
+        params.open_order_id = options.open_order_id;
+      }
+
+      // 生成签名
+      const hash = getHash(params, this.config.appSecret);
+      params.hash = hash;
+
+      // 发送查询请求
+      const response = await axios.post(
+        process.env.HUPIJIAO_QUERY_URL || 'https://api.xunhupay.com/payment/query.html',
+        new URLSearchParams(params),
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+        }
+      );
+
+      console.log('虎皮椒订单查询响应:', response.data);
+
+      if (response.data.errcode === 0) {
+        return {
+          success: true,
+          data: response.data.data,
+        };
+      } else {
+        return {
+          success: false,
+          error: response.data.errmsg || '查询失败',
+        };
+      }
+    } catch (error) {
+      console.error('虎皮椒订单查询错误:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : '订单查询请求异常',
+      };
     }
   }
 }

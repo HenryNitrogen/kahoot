@@ -14,6 +14,7 @@
   "/api/payment/hupijiao/create/route": "app/api/payment/hupijiao/create/route.js",
   "/api/payment/hupijiao/notify/route": "app/api/payment/hupijiao/notify/route.js",
   "/api/payment/hupijiao/query/route": "app/api/payment/hupijiao/query/route.js",
+  "/api/payment/process-success/route": "app/api/payment/process-success/route.js",
   "/api/payment/status/route": "app/api/payment/status/route.js",
   "/api/payment/webhook/route": "app/api/payment/webhook/route.js",
   "/api/redeem/route": "app/api/redeem/route.js",
@@ -27,6 +28,7 @@
   "/login/page": "app/login/page.js",
   "/page": "app/page.js",
   "/payment-debug/page": "app/payment-debug/page.js",
+  "/payment/guide/page": "app/payment/guide/page.js",
   "/payment/success/page": "app/payment/success/page.js",
   "/payment/test/page": "app/payment/test/page.js",
   "/privacy/page": "app/privacy/page.js",
@@ -37,7 +39,9 @@
   "/test-extension/page": "app/test-extension/page.js",
   "/test-ip/page": "app/test-ip/page.js",
   "/test-payment-status/page": "app/test-payment-status/page.js",
+  "/test-payment/page": "app/test-payment/page.js",
   "/test-recaptcha/page": "app/test-recaptcha/page.js",
+  "/test-upgrade/page": "app/test-upgrade/page.js",
   "/test/page": "app/test/page.js",
   "/tutorial/page": "app/tutorial/page.js"
 }

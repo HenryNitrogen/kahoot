@@ -95,6 +95,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/payment-debug">
 }
 
+// Validate ../../app/payment/guide/page.tsx
+{
+  const handler = {} as typeof import("../../app/payment/guide/page.js")
+  handler satisfies AppPageConfig<"/payment/guide">
+}
+
 // Validate ../../app/payment/success/page.tsx
 {
   const handler = {} as typeof import("../../app/payment/success/page.js")
@@ -155,10 +161,22 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/test-payment-status">
 }
 
+// Validate ../../app/test-payment/page.tsx
+{
+  const handler = {} as typeof import("../../app/test-payment/page.js")
+  handler satisfies AppPageConfig<"/test-payment">
+}
+
 // Validate ../../app/test-recaptcha/page.tsx
 {
   const handler = {} as typeof import("../../app/test-recaptcha/page.js")
   handler satisfies AppPageConfig<"/test-recaptcha">
+}
+
+// Validate ../../app/test-upgrade/page.tsx
+{
+  const handler = {} as typeof import("../../app/test-upgrade/page.js")
+  handler satisfies AppPageConfig<"/test-upgrade">
 }
 
 // Validate ../../app/test/page.tsx
@@ -249,6 +267,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/api/payment/hupijiao/query/route.js")
   handler satisfies RouteHandlerConfig<"/api/payment/hupijiao/query">
+}
+
+// Validate ../../app/api/payment/process-success/route.ts
+{
+  const handler = {} as typeof import("../../app/api/payment/process-success/route.js")
+  handler satisfies RouteHandlerConfig<"/api/payment/process-success">
 }
 
 // Validate ../../app/api/payment/status/route.ts

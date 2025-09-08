@@ -52,27 +52,65 @@ export default function HupijiaoPayment({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // 支付状态轮询
+  // 处理支付成功的业务逻辑
+  const handlePaymentSuccessLogic = async (orderInfo: any) => {
+    try {
+      const token = localStorage.getItem('authToken');
+      if (!token) return;
+      
+      await axios.post('/api/payment/process-success', {
+        orderInfo
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      console.log('支付成功处理完成');
+    } catch (error) {
+      console.error('处理支付成功失败:', error);
+      // 不阻断正常的支付成功流程
+    }
+  };
+
+  // 支付状态轮询 - 使用虎皮椒官方查询接口
   useEffect(() => {
     let pollInterval: NodeJS.Timeout | null = null;
     
     if (paymentStatus === 'checking' && currentOrderId) {
       pollInterval = setInterval(async () => {
         try {
-          const response = await axios.get(`/api/payment/status?order_id=${currentOrderId}`);
-          console.log('轮询支付状态响应:', response.data);
+          // 使用虎皮椒官方查询接口
+          const response = await axios.get(`/api/payment/hupijiao/query?out_trade_order=${currentOrderId}`);
+          console.log('虎皮椒轮询支付状态响应:', response.data);
           
-          if (response.data.success && response.data.data && response.data.data.status === 'success') {
-            setPaymentStatus('success');
-            clearInterval(pollInterval!);
-            if (onPaymentSuccess && response.data.data.data) {
-              onPaymentSuccess(response.data.data.data);
+          if (response.data.success && response.data.data) {
+            const status = response.data.data.status;
+            const orderInfo = response.data.data.order_info;
+            
+            if (status === 'success') {
+              setPaymentStatus('success');
+              clearInterval(pollInterval!);
+              
+              // 处理支付成功的业务逻辑
+              await handlePaymentSuccessLogic(orderInfo);
+              
+              if (onPaymentSuccess && orderInfo) {
+                onPaymentSuccess(orderInfo);
+              }
+            } else if (status === 'cancelled') {
+              setPaymentStatus('failed');
+              clearInterval(pollInterval!);
+              if (onPaymentError) {
+                onPaymentError('支付已取消');
+              }
             }
+            // 如果是 pending 状态，继续轮询
           }
         } catch (error) {
-          console.error('轮询支付状态失败:', error);
+          console.error('虎皮椒轮询支付状态失败:', error);
         }
-      }, 3000); // 每3秒查询一次
+      }, 5000); // 每5秒查询一次，符合虎皮椒建议
     }
     
     return () => {
