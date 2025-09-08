@@ -89,6 +89,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/">
 }
 
+// Validate ../../app/payment-debug/page.tsx
+{
+  const handler = {} as typeof import("../../app/payment-debug/page.js")
+  handler satisfies AppPageConfig<"/payment-debug">
+}
+
 // Validate ../../app/payment/success/page.tsx
 {
   const handler = {} as typeof import("../../app/payment/success/page.js")
@@ -125,6 +131,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/terms">
 }
 
+// Validate ../../app/test-callback/page.tsx
+{
+  const handler = {} as typeof import("../../app/test-callback/page.js")
+  handler satisfies AppPageConfig<"/test-callback">
+}
+
 // Validate ../../app/test-extension/page.tsx
 {
   const handler = {} as typeof import("../../app/test-extension/page.js")
@@ -135,6 +147,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/test-ip/page.js")
   handler satisfies AppPageConfig<"/test-ip">
+}
+
+// Validate ../../app/test-payment-status/page.tsx
+{
+  const handler = {} as typeof import("../../app/test-payment-status/page.js")
+  handler satisfies AppPageConfig<"/test-payment-status">
 }
 
 // Validate ../../app/test-recaptcha/page.tsx

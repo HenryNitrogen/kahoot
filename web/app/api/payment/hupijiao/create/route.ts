@@ -18,10 +18,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 获取后端域名
-    const protocol = request.headers.get('x-forwarded-proto') || 'http';
-    const host = request.headers.get('host');
-    const backendUrl = `${protocol}://${host}`;
+    // 获取后端域名 - 优先使用环境变量配置的域名
+    const backendUrl = process.env.APP_URL || process.env.NEXTAUTH_URL || (() => {
+      const protocol = request.headers.get('x-forwarded-proto') || 'http';
+      const host = request.headers.get('host');
+      return `${protocol}://${host}`;
+    })();
+
+    console.log(`[支付创建] 使用回调域名: ${backendUrl}`);
 
     // 创建支付订单
     const hupijiaoPayment = getHupijiaoPayment();

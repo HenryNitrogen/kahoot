@@ -3,6 +3,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { getHupijiaoPayment, type NotifyData } from '../../../../../lib/hupijiaoPayment';
+import { PaymentStatusStore } from '../../../../../lib/paymentStatusStore';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,26 +35,20 @@ export async function POST(request: NextRequest) {
     if (result.success && data.status === 'OD') {
       // 这里可以添加业务逻辑处理
       // 例如：更新订单状态、增加用户余额等
-      console.log(`订单 ${data.trade_order_id} 支付成功，金额：${data.total_fee}元`);
+      console.log(`[虎皮椒回调] 订单 ${data.trade_order_id} 支付成功，金额：${data.total_fee}元`);
       
-      // 更新支付状态，供前端轮询查询
+      // 直接更新支付状态存储，不通过HTTP请求
       try {
-        await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/payment/status`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            order_id: data.trade_order_id,
-            status: 'success',
-            data: {
-              trade_order_id: data.trade_order_id,
-              total_fee: data.total_fee,
-              transaction_id: data.transaction_id,
-              timestamp: new Date().toISOString()
-            }
-          })
+        PaymentStatusStore.set(data.trade_order_id, 'success', {
+          trade_order_id: data.trade_order_id,
+          total_fee: data.total_fee,
+          transaction_id: data.transaction_id,
+          timestamp: new Date().toISOString()
         });
+        
+        console.log(`[虎皮椒回调] 支付状态更新成功 - 订单: ${data.trade_order_id}`);
       } catch (statusError) {
-        console.error('更新支付状态失败:', statusError);
+        console.error('[虎皮椒回调] 更新支付状态失败:', statusError);
       }
       
       // TODO: 根据实际业务需求处理支付成功逻辑

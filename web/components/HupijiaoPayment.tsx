@@ -60,10 +60,13 @@ export default function HupijiaoPayment({
       pollInterval = setInterval(async () => {
         try {
           const response = await axios.get(`/api/payment/status?order_id=${currentOrderId}`);
-          if (response.data.success && response.data.status === 'success') {
+          console.log('轮询支付状态响应:', response.data);
+          
+          if (response.data.success && response.data.data && response.data.data.status === 'success') {
             setPaymentStatus('success');
-            if (onPaymentSuccess && response.data.data) {
-              onPaymentSuccess(response.data.data);
+            clearInterval(pollInterval!);
+            if (onPaymentSuccess && response.data.data.data) {
+              onPaymentSuccess(response.data.data.data);
             }
           }
         } catch (error) {
@@ -94,7 +97,7 @@ export default function HupijiaoPayment({
       
       if (result.success && result.data) {
         setPaymentData(result.data);
-        setCurrentOrderId(result.data.openid);
+        setCurrentOrderId(order_id); // 使用我们传入的订单号，而不是虎皮椒返回的openid
         
         // 根据设备类型决定处理方式
         if (isMobile && result.data.url) {

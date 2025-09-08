@@ -3,9 +3,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import { formatResponse } from '../../../../lib/utils/tools';
-
-// 简单的内存存储，生产环境应该使用数据库
-const paymentStatus = new Map<string, { status: string; data?: any }>();
+import { PaymentStatusStore } from '../../../../lib/paymentStatusStore';
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 检查支付状态
-    const status = paymentStatus.get(order_id);
+    const status = PaymentStatusStore.get(order_id);
     
     if (status) {
       return NextResponse.json(
@@ -52,7 +50,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 更新支付状态
-    paymentStatus.set(order_id, { status, data });
+    PaymentStatusStore.set(order_id, status, data);
     
     return NextResponse.json(
       formatResponse(true, null, '状态更新成功')
