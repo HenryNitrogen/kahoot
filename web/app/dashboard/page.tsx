@@ -61,7 +61,6 @@ export default function Dashboard() {
   const [usageHistory, setUsageHistory] = useState<UsageHistoryItem[]>([]);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [upgradeLoading, setUpgradeLoading] = useState(false);
   const { translations, language, setLanguage, loading: i18nLoading } = useTranslations();
   const router = useRouter();
 
@@ -133,46 +132,9 @@ export default function Dashboard() {
   };
 
   const handleUpgrade = async (plan: 'premium' | 'pro') => {
-    if (upgradeLoading) return;
-    
-    setUpgradeLoading(true);
-    try {
-      const token = localStorage.getItem('authToken');
-      if (!token) {
-        router.push('/login');
-        return;
-      }
-
-      // Map plan to API plan names
-      const apiPlan = plan === 'premium' ? 'monthly' : 'yearly';
-      
-      const response = await fetch('/api/payment/create-order', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ plan: apiPlan })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        if (result.paymentUrl) {
-          // Open payment URL in new tab
-          window.open(result.paymentUrl, '_blank');
-        } else {
-          alert('Payment system is currently being set up. Please try again later.');
-        }
-      } else {
-        const error = await response.json();
-        alert(`Payment failed: ${error.error || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      alert('Payment system error. Please try again later.');
-    } finally {
-      setUpgradeLoading(false);
-    }
+    // 直接跳转到收银台页面选择套餐
+    const planParam = plan === 'premium' ? 'monthly' : 'yearly';
+    router.push(`/checkout?plan=${planParam}`);
   };
 
   const formatDate = (dateString: string) => {
@@ -459,18 +421,16 @@ export default function Dashboard() {
                     <div className="space-y-3">
                       <button
                         onClick={() => handleUpgrade('premium')}
-                        disabled={upgradeLoading}
-                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-3 rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all transform hover:scale-105 shadow-lg font-medium"
                       >
-                        {upgradeLoading ? translations.loading : translations.upgradeToPremium}
+                        {translations.upgradeToPremium}
                       </button>
                       <button
                         onClick={() => handleUpgrade('pro')}
-                        disabled={upgradeLoading}
-                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2 font-medium disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                        className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white px-4 py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center space-x-2 font-medium"
                       >
                         <Star className="h-5 w-5 animate-pulse" />
-                        <span>{upgradeLoading ? translations.loading : translations.upgradeToProYearly}</span>
+                        <span>{translations.upgradeToProYearly}</span>
                       </button>
                     </div>
                   </div>

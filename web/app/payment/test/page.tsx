@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import HupijiaoPayment from '../../../components/HupijiaoPayment';
 
 export default function PaymentTestPage() {
@@ -9,6 +9,17 @@ export default function PaymentTestPage() {
     money: 0.01,
     title: '测试支付',
   });
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
+      const mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
+      setIsMobile(mobile);
+    };
+    
+    checkMobile();
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -119,6 +130,7 @@ export default function PaymentTestPage() {
           <ul className="text-sm text-yellow-700 space-y-1">
             <li>• 请确保已在 .env.local 中配置了正确的虎皮椒支付参数</li>
             <li>• 测试时建议使用小金额（如 0.01 元）</li>
+            <li>• 当前设备类型：{isMobile ? '手机端（会自动跳转到支付页面）' : 'PC端（会显示二维码供扫描）'}</li>
             <li>• 支付成功后会跳转到支付成功页面</li>
             <li>• 回调通知会发送到 /api/payment/hupijiao/notify 接口</li>
           </ul>

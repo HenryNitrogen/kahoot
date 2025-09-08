@@ -36,6 +36,26 @@ export async function POST(request: NextRequest) {
       // 例如：更新订单状态、增加用户余额等
       console.log(`订单 ${data.trade_order_id} 支付成功，金额：${data.total_fee}元`);
       
+      // 更新支付状态，供前端轮询查询
+      try {
+        await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/payment/status`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            order_id: data.trade_order_id,
+            status: 'success',
+            data: {
+              trade_order_id: data.trade_order_id,
+              total_fee: data.total_fee,
+              transaction_id: data.transaction_id,
+              timestamp: new Date().toISOString()
+            }
+          })
+        });
+      } catch (statusError) {
+        console.error('更新支付状态失败:', statusError);
+      }
+      
       // TODO: 根据实际业务需求处理支付成功逻辑
       // 例如：
       // - 更新数据库中的订单状态

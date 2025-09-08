@@ -53,6 +53,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/admin">
 }
 
+// Validate ../../app/checkout/page.tsx
+{
+  const handler = {} as typeof import("../../app/checkout/page.js")
+  handler satisfies AppPageConfig<"/checkout">
+}
+
 // Validate ../../app/dashboard/page.tsx
 {
   const handler = {} as typeof import("../../app/dashboard/page.js")
@@ -225,6 +231,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/api/payment/hupijiao/query/route.js")
   handler satisfies RouteHandlerConfig<"/api/payment/hupijiao/query">
+}
+
+// Validate ../../app/api/payment/status/route.ts
+{
+  const handler = {} as typeof import("../../app/api/payment/status/route.js")
+  handler satisfies RouteHandlerConfig<"/api/payment/status">
 }
 
 // Validate ../../app/api/payment/webhook/route.ts
