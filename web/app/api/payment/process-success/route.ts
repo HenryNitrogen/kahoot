@@ -4,6 +4,7 @@
  */
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
+import { updateUserSubscription, getPlanName, getPlanDuration } from '../../../../lib/subscriptionService';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret-key-change-in-production';
 
@@ -83,15 +84,16 @@ export async function POST(request: NextRequest) {
 async function processSubscriptionUpgrade(userId: string, plan: string, orderInfo: any) {
   try {
     // 确定订阅类型和期限
-    const subscriptionPlan = plan === 'monthly' ? 'premium' : 'pro';
-    const duration = plan === 'monthly' ? 30 : 365; // 月度30天，年度365天
+    const subscriptionPlan = getPlanName(plan);
+    const duration = getPlanDuration(plan);
     
     // 计算到期时间
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + duration);
     
-    console.log(`[前端订阅更新] 订阅详情`, {
+    console.log(`[支付成功处理] 开始处理订阅升级`, {
       userId,
+      originalPlan: plan,
       subscriptionPlan,
       duration: `${duration}天`,
       expiresAt: expiresAt.toISOString(),
@@ -100,36 +102,37 @@ async function processSubscriptionUpgrade(userId: string, plan: string, orderInf
       transactionId: orderInfo.transaction_id
     });
     
-    // TODO: 实际的数据库更新操作
-    // await prisma.user.update({
-    //   where: { id: userId },
-    //   data: {
-    //     subscription: {
-    //       upsert: {
-    //         create: {
-    //           plan: subscriptionPlan,
-    //           status: 'active',
-    //           expiresAt: expiresAt,
-    //           paymentId: orderInfo.transaction_id,
-    //           amount: parseFloat(orderInfo.total_amount)
-    //         },
-    //         update: {
-    //           plan: subscriptionPlan,
-    //           status: 'active',
-    //           expiresAt: expiresAt,
-    //           paymentId: orderInfo.transaction_id,
-    //           amount: parseFloat(orderInfo.total_amount),
-    //           updatedAt: new Date()
-    //         }
-    //       }
-    //     }
-    //   }
-    // });
+    // 更新用户订阅状态
+    const subscription = await updateUserSubscription(userId, {
+      plan: subscriptionPlan,
+      status: 'active',
+      expiresAt: expiresAt,
+      paymentId: orderInfo.transaction_id,
+      amount: orderInfo.total_amount ? parseFloat(orderInfo.total_amount) : undefined
+    });
     
-    console.log(`✅ [前端订阅更新] 用户 ${userId} 成功升级到 ${subscriptionPlan} 计划，有效期至 ${expiresAt.toLocaleDateString()}`);
+    console.log(`✅ [支付成功处理] 用户 ${userId} 成功升级到 ${subscriptionPlan} 计划`, {
+      planName: subscriptionPlan,
+      validUntil: expiresAt.toISOString(),
+      subscriptionId: subscription?.id
+    });
+    
+    return subscription;
     
   } catch (error) {
-    console.error(`❌ [前端订阅更新] 更新用户 ${userId} 订阅失败:`, error);
+    console.error(`❌ [支付成功处理] 更新用户 ${userId} 订阅失败:`, error);
+    
+    // 记录详细错误信息用于调试
+    console.error(`错误详情:`, {
+      userId,
+      plan,
+      orderInfo,
+      error: error instanceof Error ? {
+        message: error.message,
+        stack: error.stack
+      } : error
+    });
+    
     throw error;
   }
 }

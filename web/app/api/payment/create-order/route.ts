@@ -57,9 +57,9 @@ export async function POST(request: NextRequest) {
     //   return NextResponse.json({ error: '用户不存在' }, { status: 404 });
     // }
 
-    // 创建订单
+    // 创建订单（使用UPGRADE_前缀保持与前端一致）
     const order: Order = {
-      id: `order_${Date.now()}`,
+      id: `UPGRADE_${Date.now()}`,
       userId: decoded.userId,
       plan: plan,
       amount: plan === 'monthly' ? 15 : 50, // 高级版15元，专业版50元

@@ -257,12 +257,6 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies RouteHandlerConfig<"/api/payment/hupijiao/create">
 }
 
-// Validate ../../app/api/payment/hupijiao/notify/route.ts
-{
-  const handler = {} as typeof import("../../app/api/payment/hupijiao/notify/route.js")
-  handler satisfies RouteHandlerConfig<"/api/payment/hupijiao/notify">
-}
-
 // Validate ../../app/api/payment/hupijiao/query/route.ts
 {
   const handler = {} as typeof import("../../app/api/payment/hupijiao/query/route.js")

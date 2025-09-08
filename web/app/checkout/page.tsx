@@ -63,6 +63,7 @@ function CheckoutContent() {
   const [showPayment, setShowPayment] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
 
   useEffect(() => {
     // 从URL参数获取预选的套餐
@@ -80,6 +81,39 @@ function CheckoutContent() {
     
     checkMobile();
   }, [searchParams]);
+
+  // 防止用户在支付处理过程中离开页面
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isProcessingPayment) {
+        e.preventDefault();
+        e.returnValue = '您的支付正在处理中，离开页面可能导致订阅升级失败。确定要离开吗？';
+        return e.returnValue;
+      }
+    };
+
+    const handlePopState = (e: PopStateEvent) => {
+      if (isProcessingPayment) {
+        const confirmed = window.confirm('您的支付正在处理中，离开页面可能导致订阅升级失败。确定要离开吗？');
+        if (!confirmed) {
+          // 阻止导航
+          window.history.pushState(null, '', window.location.href);
+        }
+      }
+    };
+
+    if (isProcessingPayment) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+      window.addEventListener('popstate', handlePopState);
+      // 添加一个历史记录条目，以便检测后退操作
+      window.history.pushState(null, '', window.location.href);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [isProcessingPayment]);
 
   const selectedPlanData = plans.find(plan => plan.id === selectedPlan)!;
 
@@ -106,6 +140,7 @@ function CheckoutContent() {
         if (result.paymentUrl) {
           // 在当前页面显示支付组件
           setShowPayment(true);
+          // 注意：不在这里设置 isProcessingPayment，而是等待支付组件的状态回调
         } else {
           alert('支付系统暂时不可用，请稍后重试');
         }
@@ -123,20 +158,30 @@ function CheckoutContent() {
 
   const handlePaymentSuccess = (data: any) => {
     console.log('支付成功:', data);
+    setIsProcessingPayment(false); // 取消处理状态
     
-    // 显示支付成功消息
-    alert(`🎉 支付成功！您已成功升级到 ${selectedPlanData.name}，请稍等片刻后刷新页面查看最新状态。`);
+    // 显示支付成功消息（订阅处理已在支付组件中完成）
+    alert(`🎉 支付成功！您已成功升级到 ${selectedPlanData.name}，正在跳转到控制台...`);
     
-    // 延迟跳转到控制台，给订阅更新时间
-    setTimeout(() => {
-      router.push('/dashboard?upgraded=true');
-    }, 2000);
+    // 立即跳转到控制台，支付组件已处理完订阅更新
+    router.push('/dashboard?upgraded=true');
   };
 
   const handlePaymentError = (error: string) => {
     console.error('支付失败:', error);
+    setIsProcessingPayment(false); // 取消处理状态
     alert(`支付失败: ${error}`);
     setShowPayment(false);
+  };
+
+  // 处理支付状态变化
+  const handlePaymentStatusChange = (status: string) => {
+    // 当支付状态变为 processing 或 success 时，设置处理状态
+    if (status === 'processing' || status === 'success') {
+      setIsProcessingPayment(true);
+    } else if (status === 'failed' || status === 'completed') {
+      setIsProcessingPayment(false);
+    }
   };
 
   if (showPayment) {
@@ -145,11 +190,19 @@ function CheckoutContent() {
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
             <button
-              onClick={() => setShowPayment(false)}
-              className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-800 mb-4"
+              onClick={() => {
+                if (isProcessingPayment) {
+                  const confirmed = window.confirm('您的支付正在处理中，确定要返回吗？这可能导致订阅升级失败。');
+                  if (!confirmed) return;
+                  setIsProcessingPayment(false);
+                }
+                setShowPayment(false);
+              }}
+              disabled={isProcessingPayment && loading}
+              className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-800 mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ArrowLeft className="h-4 w-4" />
-              <span>返回选择套餐</span>
+              <span>{isProcessingPayment ? '处理中，请勿离开...' : '返回选择套餐'}</span>
             </button>
             <h1 className="text-3xl font-extrabold text-gray-900">
               完成支付
@@ -173,6 +226,17 @@ function CheckoutContent() {
             </div>
 
             <div className="mb-6">
+              {isProcessingPayment && (
+                <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-pulse w-2 h-2 bg-red-500 rounded-full"></div>
+                    <p className="text-sm text-red-800 font-medium">
+                      ⚠️ 正在处理支付和订阅升级，请勿关闭或离开此页面，否则可能导致升级失败！
+                    </p>
+                  </div>
+                </div>
+              )}
+              
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <p className="text-sm text-yellow-800">
                   <strong>支付说明：</strong>
@@ -190,6 +254,7 @@ function CheckoutContent() {
               title={`Kahoot助手升级 - ${selectedPlanData.name}`}
               onPaymentSuccess={handlePaymentSuccess}
               onPaymentError={handlePaymentError}
+              onStatusChange={handlePaymentStatusChange}
             />
           </div>
         </div>
