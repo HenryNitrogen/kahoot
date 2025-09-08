@@ -1,5 +1,12 @@
 {
+  "/api/auth/login/route": "app/api/auth/login/route.js",
+  "/api/auth/me/route": "app/api/auth/me/route.js",
+  "/api/payment/create-order/route": "app/api/payment/create-order/route.js",
+  "/api/payment/hupijiao/create/route": "app/api/payment/hupijiao/create/route.js",
+  "/dashboard/page": "app/dashboard/page.js",
   "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/login/page": "app/login/page.js",
   "/page": "app/page.js",
-  "/privacy/page": "app/privacy/page.js"
+  "/payment/success/page": "app/payment/success/page.js",
+  "/payment/test/page": "app/payment/test/page.js"
 }
