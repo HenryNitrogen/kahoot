@@ -5,7 +5,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { updateUserSubscription, getPlanName, getPlanDuration } from '../../../../lib/subscriptionService';
+import { PrismaClient } from '@prisma/client';
 
+const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret-key-change-in-production';
 
 export async function POST(request: NextRequest) {
@@ -83,6 +85,21 @@ export async function POST(request: NextRequest) {
  */
 async function processSubscriptionUpgrade(userId: string, plan: string, orderInfo: any) {
   try {
+    // 更新交易记录为成功状态
+    await prisma.paymentTransaction.updateMany({
+      where: { 
+        orderId: orderInfo.out_trade_order,
+        userId: userId,
+        status: 'pending'
+      },
+      data: {
+        status: 'success',
+        paidAt: new Date(),
+        providerOrderId: orderInfo.transaction_id || orderInfo.trade_no,
+        providerData: orderInfo
+      }
+    });
+    
     // 确定订阅类型和期限
     const subscriptionPlan = getPlanName(plan);
     const duration = getPlanDuration(plan);

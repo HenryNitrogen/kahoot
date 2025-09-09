@@ -520,13 +520,7 @@ export default function DashboardPage() {
                     <Gift className="h-5 w-5 text-green-600" />
                     <span className="text-gray-900 font-medium">{translations.redeemCenter}</span>
                   </button>
-                  <button 
-                    onClick={() => router.push('/payment/test')}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gradient-to-r hover:from-blue-50 hover:to-cyan-50 rounded-xl transition-all transform hover:scale-105"
-                  >
-                    <CreditCard className="h-5 w-5 text-blue-600" />
-                    <span className="text-gray-900 font-medium">虎皮椒支付宝测试</span>
-                  </button>
+
                   <button 
                     onClick={() => router.push('/tutorial')}
                     className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-gradient-to-r hover:from-orange-50 hover:to-yellow-50 rounded-xl transition-all transform hover:scale-105"

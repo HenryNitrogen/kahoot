@@ -395,7 +395,6 @@ export default function Home() {
             <div>
               <h4 className="font-bold mb-6 text-lg">{language === 'zh' ? '支持' : 'Support'}</h4>
               <ul className="space-y-3 text-gray-400">
-                <li><Link href="/test-extension" className="hover:text-white transition-colors hover:translate-x-1 inline-block">{language === 'zh' ? '测试扩展' : 'Test Extension'}</Link></li>
                 <li><a href="mailto:support@henryni.cn" className="hover:text-white transition-colors hover:translate-x-1 inline-block">{language === 'zh' ? '联系我们' : 'Contact Us'}</a></li>
                 <li><Link href="/redeem" className="hover:text-white transition-colors hover:translate-x-1 inline-block">{language === 'zh' ? '兑换码' : 'Redeem Code'}</Link></li>
               </ul>

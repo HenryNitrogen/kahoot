@@ -385,9 +385,7 @@ export default function TutorialPage() {
             <Link href="/" className="text-indigo-600 hover:text-indigo-700">
               {translations.returnHome}
             </Link>
-            <Link href="/test-extension" className="text-indigo-600 hover:text-indigo-700">
-              {translations.testExtension}
-            </Link>
+
             <a href="mailto:support@henryni.cn" className="text-indigo-600 hover:text-indigo-700">
               {translations.contactSupport}
             </a>

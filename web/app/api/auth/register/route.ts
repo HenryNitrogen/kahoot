@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { UserService } from '@/lib/userService';
 import { generateToken, isValidEmail, isValidPassword } from '@/lib/auth';
-import { verifyRecaptcha } from '@/lib/recaptcha';
 
 export async function POST(request: NextRequest) {
   try {
-    const { name, email, password, recaptchaToken } = await request.json();
+    const { name, email, password } = await request.json();
 
     // 验证输入
     if (!name || !email || !password) {
@@ -13,31 +12,6 @@ export async function POST(request: NextRequest) {
         { error: '请填写所有必需字段' },
         { status: 400 }
       );
-    }
-
-    // 检查是否为扩展请求
-    const isExtensionRequest = request.headers.get('x-source') === 'extension';
-    
-    if (isExtensionRequest) {
-      console.log('🔗 Extension register request detected - skipping reCAPTCHA');
-    }
-
-    // 验证reCAPTCHA (扩展请求跳过)
-    if (!isExtensionRequest) {
-      if (!recaptchaToken) {
-        return NextResponse.json(
-          { error: 'Please complete the reCAPTCHA verification' },
-          { status: 400 }
-        );
-      }
-
-      const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
-      if (!isRecaptchaValid) {
-        return NextResponse.json(
-          { error: 'reCAPTCHA verification failed' },
-          { status: 400 }
-        );
-      }
     }
 
     // 验证邮箱格式

@@ -4,14 +4,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Download, Chrome, AlertCircle, CheckCircle, Zap, Users, TrendingUp } from 'lucide-react';
 import { useTranslations } from '@/lib/i18n';
-import ReCaptcha from '@/components/ReCaptcha';
 
 export default function DownloadPage() {
   const [downloaded, setDownloaded] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
-  const [showRecaptcha, setShowRecaptcha] = useState(false);
   const [downloadStats, setDownloadStats] = useState<{
     totalDownloads: number;
     zipDownloads: number;
@@ -28,11 +25,6 @@ export default function DownloadPage() {
   }, []);
 
   const handleDownload = async () => {
-    if (!recaptchaToken) {
-      setShowRecaptcha(true);
-      return;
-    }
-
     try {
       setIsDownloading(true);
       setDownloadProgress(0);
@@ -56,7 +48,7 @@ export default function DownloadPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ recaptchaToken }),
+        body: JSON.stringify({}),
       });
       
       setDownloadProgress(50);
@@ -95,14 +87,6 @@ export default function DownloadPage() {
       alert(error instanceof Error ? error.message : '下载失败，请稍后重试或联系技术支持');
       setDownloadProgress(0);
       setDownloaded(false);
-      setRecaptchaToken(null); // Reset reCAPTCHA on error
-    }
-  };
-
-  const handleRecaptchaChange = (token: string | null) => {
-    setRecaptchaToken(token);
-    if (token) {
-      setShowRecaptcha(false);
     }
   };
 
@@ -193,87 +177,95 @@ export default function DownloadPage() {
         )}
 
         {/* 下载卡片 */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center space-x-4">
-              <div className="h-16 w-16 bg-indigo-100 rounded-full flex items-center justify-center">
-                <Chrome className="h-8 w-8 text-indigo-600" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Chrome Extension Store 版本 */}
+          <div className="bg-white rounded-2xl shadow-xl p-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
+                <Chrome className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">Kahoot Quiz Helper</h2>
-                <p className="text-gray-600">Chrome浏览器扩展源码版本 v1.0.0</p>
+                <h3 className="text-lg font-semibold text-gray-900">Chrome 网上应用店</h3>
+                <p className="text-sm text-gray-600">官方商店版本（推荐）</p>
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-gray-500 mb-1">文件大小</div>
-              <div className="text-lg font-semibold text-gray-900">~50KB</div>
+            
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+              <p className="text-green-700 text-sm">✅ 自动更新，安装简单，安全可靠</p>
             </div>
+
+            <div className="space-y-2 mb-6">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-gray-700">一键安装</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-gray-700">自动更新</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-gray-700">官方认证</span>
+              </div>
+            </div>
+
+            <a
+              href="https://chromewebstore.google.com/detail/olpjppddeblaooabokoehcokjdjjghoh"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full bg-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center space-x-2"
+            >
+              <Chrome className="h-5 w-5" />
+              <span>从 Chrome 网上应用店安装</span>
+            </a>
           </div>
 
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <h3 className="font-medium text-green-800 mb-2">📁 {translations.sourceVersion}</h3>
-            <p className="text-green-700 text-sm">{translations.sourceVersionDesc}</p>
-          </div>
-
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="font-semibold text-gray-900 mb-4">{translations.features}:</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span className="text-gray-700">{translations.realtimeRecognition}</span>
+          {/* 源码版本 */}
+          <div className="bg-white rounded-2xl shadow-xl p-6">
+            <div className="flex items-center space-x-4 mb-4">
+              <div className="h-12 w-12 bg-indigo-100 rounded-full flex items-center justify-center">
+                <Download className="h-6 w-6 text-indigo-600" />
               </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span className="text-gray-700">{translations.aiRecommendations}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span className="text-gray-700">{translations.draggableInterface}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span className="text-gray-700">{translations.customDisplay}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span className="text-gray-700">{translations.fullSourceCode}</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <CheckCircle className="h-5 w-5 text-green-500" />
-                <span className="text-gray-700">{translations.customizable}</span>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">源码版本</h3>
+                <p className="text-sm text-gray-600">开发者版本，可自定义</p>
               </div>
             </div>
 
-            {/* reCAPTCHA */}
-            {showRecaptcha && (
-              <div className="mb-6">
-                <div className="text-center mb-4">
-                  <p className="text-gray-700">Please complete the verification to download:</p>
-                </div>
-                <div className="flex justify-center">
-                  <ReCaptcha 
-                    onVerify={handleRecaptchaChange}
-                    onExpired={() => setRecaptchaToken(null)}
-                  />
-                </div>
+            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-blue-700 text-sm">🔧 需要手动安装，支持自定义修改</p>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-gray-700">完整源代码</span>
               </div>
-            )}
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-gray-700">可自定义</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="h-4 w-4 text-green-500" />
+                <span className="text-sm text-gray-700">学习用途</span>
+              </div>
+            </div>
 
             <button
               onClick={handleDownload}
               disabled={isDownloading}
-              className="w-full bg-green-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2 relative overflow-hidden"
+              className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2 relative overflow-hidden"
             >
               {isDownloading && (
                 <div 
-                  className="absolute left-0 top-0 h-full bg-green-500 transition-all duration-300 ease-out"
+                  className="absolute left-0 top-0 h-full bg-indigo-500 transition-all duration-300 ease-out"
                   style={{ width: `${downloadProgress}%` }}
                 />
               )}
               <Download className="h-5 w-5 relative z-10" />
               <span className="relative z-10">
                 {isDownloading ? `${translations.downloading}... ${downloadProgress}%` : 
-                 downloaded ? translations.downloadComplete : translations.downloadSourceCode}
+                 downloaded ? translations.downloadComplete : '下载源码版本'}
               </span>
             </button>
           </div>
@@ -387,9 +379,7 @@ export default function DownloadPage() {
             <Link href="/dashboard" className="text-indigo-600 hover:text-indigo-700">
               {translations.dashboard}
             </Link>
-            <Link href="/test-extension" className="text-indigo-600 hover:text-indigo-700">
-              {translations.testExtension}
-            </Link>
+
           </div>
         </div>
       </div>

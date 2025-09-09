@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Zap, Mail, Lock, Eye, EyeOff, User } from 'lucide-react';
 import { useTranslations } from '@/lib/i18n';
-import ReCaptcha from '@/components/ReCaptcha';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -18,7 +17,6 @@ export default function Register() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const { translations } = useTranslations();
   const router = useRouter();
 
@@ -33,12 +31,6 @@ export default function Register() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    if (!recaptchaToken) {
-      setError('Please complete the reCAPTCHA verification');
-      setLoading(false);
-      return;
-    }
 
     if (formData.password !== formData.confirmPassword) {
       setError(translations.passwordMismatch);
@@ -61,8 +53,7 @@ export default function Register() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          password: formData.password,
-          recaptchaToken
+          password: formData.password
         }),
       });
 
@@ -73,18 +64,12 @@ export default function Register() {
         router.push('/dashboard');
       } else {
         setError(data.error || translations.registrationFailed);
-        setRecaptchaToken(null); // Reset reCAPTCHA on error
       }
     } catch (err) {
       setError(translations.networkError);
-      setRecaptchaToken(null); // Reset reCAPTCHA on error
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleRecaptchaChange = (token: string | null) => {
-    setRecaptchaToken(token);
   };
 
   return (
@@ -208,17 +193,9 @@ export default function Register() {
               <Link href="/privacy" className="text-indigo-600 hover:text-indigo-700">{translations.privacyPolicy}</Link>
             </div>
 
-            {/* reCAPTCHA */}
-            <div className="flex justify-center">
-              <ReCaptcha 
-                onVerify={handleRecaptchaChange}
-                onExpired={() => setRecaptchaToken(null)}
-              />
-            </div>
-
             <button
               type="submit"
-              disabled={loading || !recaptchaToken}
+              disabled={loading}
               className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? translations.registering : translations.signUp}

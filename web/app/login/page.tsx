@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Zap, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useTranslations } from '@/lib/i18n';
-import ReCaptcha from '@/components/ReCaptcha';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -13,7 +12,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const { translations } = useTranslations();
   const router = useRouter();
 
@@ -21,12 +19,6 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    if (!recaptchaToken) {
-      setError('Please complete the reCAPTCHA verification');
-      setLoading(false);
-      return;
-    }
 
     try {
       const response = await fetch('/api/auth/login', {
@@ -36,8 +28,7 @@ export default function Login() {
         },
         body: JSON.stringify({ 
           email, 
-          password,
-          recaptchaToken 
+          password
         }),
       });
 
@@ -48,18 +39,12 @@ export default function Login() {
         router.push('/dashboard');
       } else {
         setError(data.error || translations.loginFailed);
-        setRecaptchaToken(null); // Reset reCAPTCHA on error
       }
     } catch (err) {
       setError(translations.networkError);
-      setRecaptchaToken(null); // Reset reCAPTCHA on error
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleRecaptchaChange = (token: string | null) => {
-    setRecaptchaToken(token);
   };
 
   return (
@@ -137,17 +122,9 @@ export default function Login() {
               </Link>
             </div>
 
-            {/* reCAPTCHA */}
-            <div className="flex justify-center">
-              <ReCaptcha 
-                onVerify={handleRecaptchaChange}
-                onExpired={() => setRecaptchaToken(null)}
-              />
-            </div>
-
             <button
               type="submit"
-              disabled={loading || !recaptchaToken}
+              disabled={loading}
               className="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? translations.loggingIn : translations.loginButton}

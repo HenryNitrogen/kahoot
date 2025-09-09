@@ -3,7 +3,8 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import HupijiaoPayment from '../../components/HupijiaoPayment';
-import { CreditCard, Shield, Star, Check, ArrowLeft } from 'lucide-react';
+import { CreditCard, Shield, Star, Check, ArrowLeft, Smartphone } from 'lucide-react';
+import { isMobileDevice, showMobilePaymentBlockedMessage } from '@/lib/deviceDetection';
 
 interface PlanOption {
   id: 'monthly' | 'yearly';
@@ -57,29 +58,29 @@ export default function CheckoutPage() {
 }
 
 function CheckoutContent() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('yearly');
   const [showPayment, setShowPayment] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
 
   useEffect(() => {
-    // 从URL参数获取预选的套餐
-    const planParam = searchParams.get('plan');
-    if (planParam === 'monthly' || planParam === 'yearly') {
-      setSelectedPlan(planParam);
+    // 检测移动设备
+    const mobile = isMobileDevice();
+    setIsMobile(mobile);
+    
+    if (mobile) {
+      // 移动端显示警告但不立即阻止
+      console.log('移动设备检测到，支付功能将被限制');
     }
 
-    // 检测设备类型
-    const checkMobile = () => {
-      const userAgent = navigator.userAgent || navigator.vendor || (window as any).opera;
-      const mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent.toLowerCase());
-      setIsMobile(mobile);
-    };
-    
-    checkMobile();
+    // 从URL参数获取预选计划
+    const plan = searchParams.get('plan');
+    if (plan === 'monthly' || plan === 'yearly') {
+      setSelectedPlan(plan);
+    }
   }, [searchParams]);
 
   // 防止用户在支付处理过程中离开页面
@@ -116,6 +117,14 @@ function CheckoutContent() {
   }, [isProcessingPayment]);
 
   const selectedPlanData = plans.find(plan => plan.id === selectedPlan)!;
+
+  const handlePaymentStart = () => {
+    if (isMobile) {
+      showMobilePaymentBlockedMessage();
+      return;
+    }
+    setShowPayment(true);
+  };
 
   const handleContinuePayment = async () => {
     setLoading(true);
@@ -263,8 +272,36 @@ function CheckoutContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-50">
+      {isMobile ? (
+        // Mobile blocked UI
+        <div className="flex items-center justify-center p-4 min-h-screen">
+          <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
+            <div className="mb-6">
+              <Smartphone className="h-16 w-16 text-orange-500 mx-auto mb-4" />
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">移动端暂不支持</h1>
+              <p className="text-gray-600">
+                为了保证支付安全和最佳体验，请使用电脑访问完成支付。
+              </p>
+            </div>
+            
+            <div className="bg-blue-50 rounded-lg p-4 mb-6">
+              <h3 className="font-semibold text-blue-900 mb-2">联系我们</h3>
+              <p className="text-blue-700 text-sm">henryni710@gmail.com</p>
+            </div>
+            
+            <button
+              onClick={() => router.push('/')}
+              className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+            >
+              返回首页
+            </button>
+          </div>
+        </div>
+      ) : (
+        // Desktop UI
+        <div className="py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-4xl mx-auto">{/* Existing content will continue here */}
         <div className="text-center mb-8">
           <button
             onClick={() => router.back()}
@@ -371,7 +408,9 @@ function CheckoutContent() {
             </p>
           </div>
         </div>
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

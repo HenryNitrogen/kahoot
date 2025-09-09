@@ -89,28 +89,10 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/">
 }
 
-// Validate ../../app/payment-debug/page.tsx
-{
-  const handler = {} as typeof import("../../app/payment-debug/page.js")
-  handler satisfies AppPageConfig<"/payment-debug">
-}
-
-// Validate ../../app/payment/guide/page.tsx
-{
-  const handler = {} as typeof import("../../app/payment/guide/page.js")
-  handler satisfies AppPageConfig<"/payment/guide">
-}
-
 // Validate ../../app/payment/success/page.tsx
 {
   const handler = {} as typeof import("../../app/payment/success/page.js")
   handler satisfies AppPageConfig<"/payment/success">
-}
-
-// Validate ../../app/payment/test/page.tsx
-{
-  const handler = {} as typeof import("../../app/payment/test/page.js")
-  handler satisfies AppPageConfig<"/payment/test">
 }
 
 // Validate ../../app/privacy/page.tsx
@@ -131,52 +113,16 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies AppPageConfig<"/register">
 }
 
+// Validate ../../app/set-admin/page.tsx
+{
+  const handler = {} as typeof import("../../app/set-admin/page.js")
+  handler satisfies AppPageConfig<"/set-admin">
+}
+
 // Validate ../../app/terms/page.tsx
 {
   const handler = {} as typeof import("../../app/terms/page.js")
   handler satisfies AppPageConfig<"/terms">
-}
-
-// Validate ../../app/test-callback/page.tsx
-{
-  const handler = {} as typeof import("../../app/test-callback/page.js")
-  handler satisfies AppPageConfig<"/test-callback">
-}
-
-// Validate ../../app/test-extension/page.tsx
-{
-  const handler = {} as typeof import("../../app/test-extension/page.js")
-  handler satisfies AppPageConfig<"/test-extension">
-}
-
-// Validate ../../app/test-ip/page.tsx
-{
-  const handler = {} as typeof import("../../app/test-ip/page.js")
-  handler satisfies AppPageConfig<"/test-ip">
-}
-
-// Validate ../../app/test-payment-status/page.tsx
-{
-  const handler = {} as typeof import("../../app/test-payment-status/page.js")
-  handler satisfies AppPageConfig<"/test-payment-status">
-}
-
-// Validate ../../app/test-payment/page.tsx
-{
-  const handler = {} as typeof import("../../app/test-payment/page.js")
-  handler satisfies AppPageConfig<"/test-payment">
-}
-
-// Validate ../../app/test-recaptcha/page.tsx
-{
-  const handler = {} as typeof import("../../app/test-recaptcha/page.js")
-  handler satisfies AppPageConfig<"/test-recaptcha">
-}
-
-// Validate ../../app/test-upgrade/page.tsx
-{
-  const handler = {} as typeof import("../../app/test-upgrade/page.js")
-  handler satisfies AppPageConfig<"/test-upgrade">
 }
 
 // Validate ../../app/test/page.tsx
@@ -201,6 +147,24 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/api/admin/dashboard/route.js")
   handler satisfies RouteHandlerConfig<"/api/admin/dashboard">
+}
+
+// Validate ../../app/api/admin/set-admin/route.ts
+{
+  const handler = {} as typeof import("../../app/api/admin/set-admin/route.js")
+  handler satisfies RouteHandlerConfig<"/api/admin/set-admin">
+}
+
+// Validate ../../app/api/admin/transactions/route.ts
+{
+  const handler = {} as typeof import("../../app/api/admin/transactions/route.js")
+  handler satisfies RouteHandlerConfig<"/api/admin/transactions">
+}
+
+// Validate ../../app/api/admin/user-subscription/route.ts
+{
+  const handler = {} as typeof import("../../app/api/admin/user-subscription/route.js")
+  handler satisfies RouteHandlerConfig<"/api/admin/user-subscription">
 }
 
 // Validate ../../app/api/admin/users/route.ts
@@ -269,6 +233,12 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   handler satisfies RouteHandlerConfig<"/api/payment/process-success">
 }
 
+// Validate ../../app/api/payment/restore-purchase/route.ts
+{
+  const handler = {} as typeof import("../../app/api/payment/restore-purchase/route.js")
+  handler satisfies RouteHandlerConfig<"/api/payment/restore-purchase">
+}
+
 // Validate ../../app/api/payment/status/route.ts
 {
   const handler = {} as typeof import("../../app/api/payment/status/route.js")
@@ -285,12 +255,6 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   const handler = {} as typeof import("../../app/api/redeem/route.js")
   handler satisfies RouteHandlerConfig<"/api/redeem">
-}
-
-// Validate ../../app/api/test-recaptcha/route.ts
-{
-  const handler = {} as typeof import("../../app/api/test-recaptcha/route.js")
-  handler satisfies RouteHandlerConfig<"/api/test-recaptcha">
 }
 
 // Validate ../../app/api/usage/history/route.ts

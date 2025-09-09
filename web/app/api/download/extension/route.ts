@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import JSZip from 'jszip';
 import { readFile } from 'fs/promises';
 import path from 'path';
-import { verifyRecaptcha } from '@/lib/recaptcha';
 
 export async function GET(request: NextRequest) {
   try {
@@ -64,25 +63,7 @@ console.log('Kahoot Quiz Helper loaded!');
 
 export async function POST(request: NextRequest) {
   try {
-    const { recaptchaToken } = await request.json();
-
-    // 验证reCAPTCHA
-    if (!recaptchaToken) {
-      return NextResponse.json(
-        { error: 'Please complete the reCAPTCHA verification' },
-        { status: 400 }
-      );
-    }
-
-    const isRecaptchaValid = await verifyRecaptcha(recaptchaToken);
-    if (!isRecaptchaValid) {
-      return NextResponse.json(
-        { error: 'reCAPTCHA verification failed' },
-        { status: 400 }
-      );
-    }
-
-    // reCAPTCHA验证通过，生成扩展包
+    // 直接生成扩展包，不需要验证
     const zip = new JSZip();
     const extensionDir = path.join(process.cwd(), 'public', 'extension');
 
